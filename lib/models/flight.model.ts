@@ -5,6 +5,8 @@ import { IContactDetails } from "@/lib/models/contact.model";
 import { IMoney } from "@/lib/models/money.model";
 import { INote } from "@/lib/models/notes.model";
 import { IPerson } from "@/lib/models/person.model";
+import { IOperator } from "./IOperators";
+import { IAsset } from "./IAssets";
 
 export interface IFlight {
   [key: string]: any; // Add this index signature to allow dynamic string indexing
@@ -18,6 +20,7 @@ export interface IFlight {
   arrivalAirport: IAirport;
   status: string;
   aircraftId: string;
+  aircraft?: IAsset;
   aircraftManufacturer: string;
   aircraftModel: string;
   aircraftRegistrationNumber: string;
@@ -37,6 +40,7 @@ export interface IFlight {
   meetingTime: Date;
   offerExpiryHoursPriorToFlight: number;
   operatorId: string;
+  operator?: IOperator;
   passengers: IPassenger[];
   pricePerSeat: number; // With platform fee
   totalFlightPrice?: number;

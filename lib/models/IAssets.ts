@@ -1,3 +1,4 @@
+import { IFile } from "./file.model";
 import { IAuditFields } from "./IAuditFields";
 
 export interface IAsset {
@@ -42,5 +43,6 @@ export interface IAsset {
   hasWashCloset: boolean;
   yearOfManufacture: number;
   status: string;
+  images: IFile[];
   auditFields?: IAuditFields;
 }

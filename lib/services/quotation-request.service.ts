@@ -15,13 +15,18 @@ export default class QuotationRequestService extends BaseService {
       {
         headers: this.headers,
       }
-    );
+    )
+      .catch((onRejected) => {
+        console.error(onRejected);
+        throw new Error("Something went wrong")
+      });
 
-    const data = await response.data;
+    console.log("🚀 ~ quotation-request.service.ts:19 ~ create response data =>", response.data)
 
-    if (response.status != 201) throw new Error(data.message);
+    if (response.status != 201) throw new Error(response.data.message);
 
-    return data;
+    console.log("🚀 ~ quotation-request.service.ts:23 ~ Error not thrown")
+    return response.data;
   };
 
   findAll = async () => {

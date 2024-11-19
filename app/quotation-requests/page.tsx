@@ -59,10 +59,6 @@ const QuotationRequests = () => {
     },
   };
 
-  const onClose = () => {
-    setShowDrawer(false);
-  };
-
   return (
     <main className="min-h-screen" style={{ backgroundColor: "#E9E2DB" }}>
       <ClientAppBar styles={{ padding: "1rem 2rem" }} />
@@ -78,7 +74,9 @@ const QuotationRequests = () => {
                   record: IQuotationRequest,
                   _index: number,
                   _array: IQuotationRequest[]
-                ) => (
+                ) => {
+                  if (!record._id) return;
+                  return (
                   <Col span={6} key={record._id}>
                     <Card
                       key={record._id}
@@ -126,6 +124,7 @@ const QuotationRequests = () => {
                     </Card>
                   </Col>
                 )
+                }
               )
             ) : (
               <Flex justify="center" className="w-full">

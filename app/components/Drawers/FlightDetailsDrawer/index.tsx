@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { Button, Drawer, Space } from "antd";
 
-import FlightDetails from "@/app/flights/[id]/page";
+import FlightDetailsComponent from "./flight-details-component";
 
 interface FlightDetailProps {
   visible: boolean;
@@ -27,7 +27,7 @@ const FlightDetailsDrawer: React.FC<FlightDetailProps> = ({
       extra={[]}
       style={{ backgroundColor: "#f7f2ed" }}
     >
-      <FlightDetails />
+      <FlightDetailsComponent />
     </Drawer>
   );
 };

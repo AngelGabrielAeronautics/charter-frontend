@@ -94,7 +94,7 @@ export const findOne = createAsyncThunk(
 export const create = createAsyncThunk(
   `${subject}/create`,
   async (payload: IQuotationRequest, thunk) => {
-    return await service.create(payload);
+    return await service.create(payload)
   }
 );
 
@@ -182,7 +182,6 @@ export const QuotationRequestSlice = createSlice({
     builder.addCase(create.fulfilled, (state, action) => {
       state.loading.createRecord = false;
       state.success.createRecord = true;
-      state.quotationRequests = [action.payload, ...state.quotationRequests];
     });
     builder.addCase(create.rejected, (state, action) => {
       state.loading.createRecord = false;

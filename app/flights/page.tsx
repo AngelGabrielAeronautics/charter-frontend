@@ -4,45 +4,23 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { UserOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Card,
-  Col,
-  Divider,
-  Empty,
-  Flex,
-  Modal,
-  Result,
-  Row,
-  Spin,
-} from "antd";
+import { Button, Card, Col, Divider, Empty, Flex, Modal, Result, Row, Spin, notification } from "antd";
 import { IoAirplane } from "react-icons/io5";
 import short from "short-uuid";
 
 import { eRoutes } from "@/app/(config)/routes";
 import ClientAppBar from "@/app/components/ClientAppBar";
 
-import {
-  formatToMoneyWithCurrency,
-  formatUCTtoISO,
-} from "@/lib/helpers/formatters.helpers";
+import { formatToMoneyWithCurrency, formatUCTtoISO } from "@/lib/helpers/formatters.helpers";
 import { IQuotationRequest } from "@/lib/models/IQuotationRequest";
 import { IUser } from "@/lib/models/IUser";
 import { IAirport } from "@/lib/models/airport.model";
 import { IAntCardStyle } from "@/lib/models/ant-card-style.interface";
 import { IFlight } from "@/lib/models/flight.model";
-import {
-  clearFlightSelection,
-  filterFlights,
-  resetFlightCriteria,
-  selectFlight,
-} from "@/lib/state/flights/flights.slice";
+import { clearFlightSelection, filterFlights, resetFlightCriteria, selectFlight } from "@/lib/state/flights/flights.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 import { fetchOperators, setCurrentOperator } from "@/lib/state/operators/operators.slice";
-import {
-  create,
-  resetActionStates,
-} from "@/lib/state/quotationRequests/quotationRequests.slice";
+import { create, resetActionStates } from "@/lib/state/quotationRequests/quotationRequests.slice";
 
 import FlightDetailsDrawer from "../components/Drawers/FlightDetailsDrawer";
 import { OperatorBanner } from "../components/Flights/OperatorBanner";
@@ -61,7 +39,7 @@ const Flights = () => {
   } = useAppSelector((state) => state.flights);
   const { operators } = useAppSelector((state) => state.operators);
   const { authenticatedUser } = useAppSelector((state) => state.auth);
-  const { loading, success } = useAppSelector(
+  const { loading, success, error } = useAppSelector(
     (state) => state.quotationsRequests
   );
 
@@ -78,17 +56,13 @@ const Flights = () => {
     }
   }, [router, authenticatedUser]);
 
-  const showDrawer = () => {
-    setDrawerVisible(true);
-  };
-
   const closeDrawer = () => {
     setDrawerVisible(false);
     dispatch(clearFlightSelection());
   };
 
   useEffect(() => {
-    dispatch(fetchOperators());
+    // if (flights.length > 0 && !searchingFlights) dispatch(fetchOperators());
 
     if (!shouldShowSearchResults && !searchingFlights) {
       dispatch(filterFlights({ departure: { $gte: new Date() } }));
@@ -143,12 +117,26 @@ const Flights = () => {
 
   useEffect(() => {
     if (loading.createRecord == false && success.createRecord == true) {
-      router.push(`/quotation-requests`);
+      notification.success({
+        message: "Quotation Request Created Successfully",
+      })
+      router.push('/quotation-requests')
       dispatch(resetActionStates());
       dispatch(resetFlightCriteria());
     }
     return () => {};
   }, [loading, success]);
+
+  useEffect(() => {
+    if (loading.createRecord == false && error.createRecord == true) {
+      notification.error({
+        message: "Quotation Request Failed",
+        description: "It seems that something has gone wrong while attempting to create a quotation request that matches your search criteria. Please run the search and submit the quotation request again",
+      });
+      dispatch(resetActionStates());
+    }
+    return () => {};
+  }, [loading, error]);
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: "#E9E2DB" }}>
@@ -183,14 +171,13 @@ const Flights = () => {
                       }}
                       onClick={() => {
                         dispatch(selectFlight(flight));
-                        const operator = operators.find((value) => value._id == flight.operatorId);
-                        if (operator) dispatch(setCurrentOperator(operator))
+                        dispatch(setCurrentOperator(flight.operator))
                         setDrawerVisible(true);
                       }}
                     >
                       <OperatorBanner
                         id={flight.operatorId}
-                        operators={operators}
+                        operator={flight.operator}
                         flag={flight.arrivalAirport.flag}
                       />
                       <div style={{ padding: "0.5rem 1rem" }}>

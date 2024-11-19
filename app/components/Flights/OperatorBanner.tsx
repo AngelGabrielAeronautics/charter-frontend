@@ -6,12 +6,12 @@ import { IOperator } from "@/lib/models/IOperators";
 
 interface IProps {
   id: string;
-  operators: IOperator[];
+  operator: IOperator;
   flag: string;
 }
 
-export const OperatorBanner = ({ id, operators, flag }: IProps) => {
-  const operator = operators.find((operator: IOperator) => operator._id === id);
+export const OperatorBanner = ({ id, operator, flag }: IProps) => {
+  // const operator = operators.find((operator: IOperator) => operator._id === id);
   return (
     <Flex
       justify="center"

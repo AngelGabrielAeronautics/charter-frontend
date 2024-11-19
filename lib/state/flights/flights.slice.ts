@@ -176,7 +176,7 @@ export const getOperatorFlights = createAsyncThunk(
 export const filterFlights = createAsyncThunk(
   "flights/filter",
   async (filter: any) => {
-    const response = await fetch(`${API_BASE_URL}/flights/filter`, {
+    const response = await fetch(`${API_BASE_URL}/flights/filter-with-operators`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
