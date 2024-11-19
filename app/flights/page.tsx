@@ -171,13 +171,13 @@ const Flights = () => {
                       }}
                       onClick={() => {
                         dispatch(selectFlight(flight));
-                        dispatch(setCurrentOperator(flight.operator))
+                        dispatch(setCurrentOperator(flight.operator!))
                         setDrawerVisible(true);
                       }}
                     >
                       <OperatorBanner
                         id={flight.operatorId}
-                        operator={flight.operator}
+                        operator={flight.operator!}
                         flag={flight.arrivalAirport.flag}
                       />
                       <div style={{ padding: "0.5rem 1rem" }}>

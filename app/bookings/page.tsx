@@ -119,7 +119,7 @@ const Bookings = () => {
                               ? booking.operatorId._id!
                               : booking.operatorId
                           }
-                          operators={operators}
+                          operator={operators[0]}
                           flag={flag}
                         />
                         <div style={{ padding: "0.5rem 1rem" }}>

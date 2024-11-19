@@ -172,7 +172,7 @@ const AgencyFlights = () => {
                 >
                   <OperatorBanner
                     id={flight.operatorId}
-                    operators={operators}
+                    operator={operators[0]}
                     flag={flight.arrivalAirport.flag}
                   />
                   <div style={{ padding: "0.5rem 1rem" }}>

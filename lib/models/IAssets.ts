@@ -43,6 +43,6 @@ export interface IAsset {
   hasWashCloset: boolean;
   yearOfManufacture: number;
   status: string;
-  images: IFile[];
+  images?: IFile[];
   auditFields?: IAuditFields;
 }
