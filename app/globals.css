@@ -1,0 +1,219 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  /* font-size: 10px; */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  min-height: 100vh;
+  background-color: "#E9E2DB";
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+#flight-details-drawer a,
+#operator-details-drawer a,
+a,
+.ant-menu-item.ant-menu-item-selected,
+.ant-menu-item.ant-menu-item-selected > a {
+  color: #0b3746 !important;
+}
+
+.ant-menu-title-content > a {
+  color: #bcbdb7 !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+h4 {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+h5 {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+h6 {
+  font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.ant-btn,
+.ant-btn-primary {
+  box-shadow: unset !important;
+  padding: 1.35rem !important;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #08415c;
+  border-radius: 6px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #0b597e;
+}
+
+.ant-input-affix-wrapper.ant-input-outlined,
+.ant-input-affix-wrapper.ant-input-outlined:hover,
+.ant-input-affix-wrapper.ant-input-outlined:focus,
+.ant-input-affix-wrapper.ant-input-outlined:active,
+.ant-input-affix-wrapper.ant-input-outlined:focus-within {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.ant-input-affix-wrapper.ant-input-outlined,
+.ant-picker:not(#add-asset-form .ant-picker),
+.ant-input:not(#submit-quotation-form .ant-input),
+.ant-input::not(#add-asset-form .ant-input) {
+  border-radius: 0 !important;
+}
+
+.ant-input:not(#submit-quotation-form .ant-input),
+.ant-input-outlined:hover:not(#submit-quotation-form .ant-input),
+.ant-input-outlined:focus:not(#submit-quotation-form .ant-input),
+.ant-input-outlined:focus-within:not(#submit-quotation-form .ant-input),
+.ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
+  background: unset !important;
+  font-size: 1rem;
+  font-weight: "600";
+}
+
+#submit-quotation-form .ant-select-selector {
+  border: 1px solid #d9d9d9 !important;
+  background: #ffffff !important;
+  font-size: 0.9rem;
+}
+
+.ant-picker.ant-picker-outlined:hover,
+.ant-picker.ant-picker-outlined:focus,
+.ant-picker.ant-picker-outlined:focus-within {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* .custom-password-input input {
+    background: #f2e8dd !important;
+    border: 1px solid #70737d !important;
+    border-radius: 10px !important;
+} */
+
+.ant-form-item-control-input-content .custom-field-input,
+.ant-input.custom-field-input,
+.ant-input:not(#submit-quotation-form .ant-input),
+.ant-input-outlined:not(#submit-quotation-form .ant-input) {
+  /* background: #f2e8dd !important;  */
+  /* border: 1px solid #70737d !important; */
+  border-radius: 10px !important;
+}
+
+.ant-menu-item.ant-menu-item-selected {
+  background-color: #042631 !important;
+  color: #d9d9d9 !important;
+}
+
+.customInvoiceRow {
+  background-color: #f3ebe2;
+  color: #0b3746;
+}
+
+.customInvoiceRow:hover {
+  background-color: #f3ebe2;
+  color: #0b3746;
+}
+
+.textColor {
+  color: #0b3746;
+}
+
+a {
+  color: #ffffff !important;
+}
+
+.auth-form a,
+.quotations-list a,
+a .anticon,
+.ant-upload-list.ant-upload-list-picture a {
+  color: #0b3746 !important;
+}
+
+.client-app-bar a .anticon {
+  color: #ffffff !important;
+}
+
+.quotations-list {
+  color: #454545 !important;
+}
+
+.ant-pagination .ant-pagination-item-active a {
+  color: #0b3746 !important;
+}
+
+.ant-input-filled {
+  background-color: #dbd4ce !important;
+}
+
+.ant-picker-calendar,
+.ant-picker-panel,
+.ant-radio-button-wrapper {
+  background-color: #f7f2ec !important;
+}

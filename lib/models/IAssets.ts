@@ -1,0 +1,46 @@
+import { IAuditFields } from "./IAuditFields";
+
+export interface IAsset {
+  _id?: string;
+  operatorId: string;
+  airConAvailable: boolean;
+  airline: string;
+  airworthinessCertificateFilePath?: string;
+  apu: boolean;
+  baggage_compartment_max_weight: number;
+  baggageCompartmentMaxWeightUnits: string;
+  baggageCompartmentSize: number[];
+  baggageType: string;
+  cabinLayoutImagePath?: string;
+  cabinHeight: number;
+  cabinLength: number;
+  cabinWidth: number;
+  cabinPressure: boolean;
+  cargoCapacity: number;
+  cargoCapacityUnits: string;
+  cockpitImagePath?: string;
+  cruiseSpeedInKnots: number;
+  exteriorImagePath?: string;
+  featureImageURL?: string;
+  heated: boolean;
+  inflightServicePersonnel: number;
+  insuranceCertificateFilePath?: string;
+  interiorImagePath?: string;
+  lastRefurbishmentDate: Date;
+  manufacturer: string;
+  minimumCockpitCrew: number;
+  model: string;
+  numberOfCrew: number;
+  petsAllowed: boolean;
+  powerPlant: string;
+  pressurized: boolean;
+  registrationNumber: string;
+  seatingCapacity: number;
+  serviceReleaseFilePath?: string;
+  smokingAllowed: boolean;
+  suitableForUnpavedAirfield: boolean;
+  hasWashCloset: boolean;
+  yearOfManufacture: number;
+  status: string;
+  auditFields?: IAuditFields;
+}
