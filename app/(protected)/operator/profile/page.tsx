@@ -57,7 +57,7 @@ const OperatorProfilePage = () => {
   ];
 
   return (
-    <div className="space-y-5">
+    <div id="operator-profile" className="space-y-5">
       <PageHeader
         title="Operator Profile"
         subtitle="Edit your profile here"

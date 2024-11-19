@@ -1,38 +1,24 @@
-import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+
+
+import { DeleteOutlined, DeleteTwoTone, PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import type { UploadFile, UploadProps } from "antd";
-import {
-  Button,
-  Checkbox,
-  Col,
-  Divider,
-  Form,
-  Image,
-  Input,
-  Progress,
-  Row,
-  Select,
-  Space,
-  Table,
-  Tabs,
-  Tag,
-  Typography,
-  Upload,
-  notification,
-} from "antd";
+import { Button, Checkbox, Col, Flex, Form, Image, Input, Row, Select, Typography, Upload, notification } from "antd";
+
+
 
 import { API_BASE_URL } from "@/app/(config)/constants";
+
+
 
 import { eModules } from "@/lib/enums/modules.enums";
 import { countries } from "@/lib/helpers/countries";
 import { IOperator } from "@/lib/models/IOperators";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
-import {
-  resetActionStates,
-  setCurrentOperator,
-  update,
-} from "@/lib/state/operators/operators.slice";
+import { resetActionStates, setCurrentOperator, update } from "@/lib/state/operators/operators.slice";
+
 
 const { Title } = Typography;
 
@@ -170,6 +156,15 @@ const CompanyDetailsSection = ({}: IProps) => {
   const [logoPreviewImage, setLogoPreviewImage] = useState("");
   const [logoFileList, setLogoFileList] = useState<UploadFile[]>([]);
 
+  const [termsAndConditionsFileList, setTermsAndConditionsFileList] = useState<
+    {
+      uid: string;
+      name: string;
+      UploadFileStatus: string;
+      url: string;
+    }[]
+  >([]);
+
   const handleLogoPreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj as File);
@@ -206,6 +201,22 @@ const CompanyDetailsSection = ({}: IProps) => {
     };
     dispatch(update(data));
   };
+
+  useEffect(() => {
+    if (currentOperator?.termsAndConditions) {
+      const defaultFileList = currentOperator?.termsAndConditions
+        ? [
+            {
+              uid: "-1",
+              name: `${currentOperator?.termsAndConditions.name}`,
+              UploadFileStatus: "done",
+              url: currentOperator.termsAndConditions.data,
+            },
+          ]
+        : [];
+      setTermsAndConditionsFileList(defaultFileList)
+    }
+  }, [currentOperator?.termsAndConditions]);
 
   return (
     <Form
@@ -305,18 +316,31 @@ const CompanyDetailsSection = ({}: IProps) => {
             <Upload
               action={`${API_BASE_URL}/${eModules.OperatorsModule}/upload/termsAndConditions/${authenticatedUser?.operatorId}`}
               listType="text"
-              fileList={
-                currentOperator?.termsAndConditions
-                  ? [
-                      {
-                        uid: "-1",
-                        name: `${currentOperator?.termsAndConditions.name}`,
-                        status: "done",
-                        url: `data:${currentOperator.termsAndConditions.mimetype};base64,${currentOperator.termsAndConditions.data}`,
-                      },
-                    ]
-                  : []
-              }
+              fileList={termsAndConditionsFileList}
+              beforeUpload={(file, fileList) => {
+                setTermsAndConditionsFileList([
+                  {
+                    uid: file.uid,
+                    name: file.name,
+                    UploadFileStatus: 'done',
+                    url: "",
+                  }
+                ]);
+              }}
+              itemRender={(originNode, file, fileList, actions) => (
+                <Flex justify="space-between" className="p-2">
+                  <Link
+                    style={{ color: "#0c3747" }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={`data:application/pdf;base64,${file.url}`}
+                    download={file.name || "TermsAndConditions.pdf"}
+                  >
+                    {file.name || "Terms and Conditions"}
+                  </Link>
+                  <DeleteTwoTone className="cursor-pointer" twoToneColor="#ff4a50" onClick={() => setTermsAndConditionsFileList([])} />
+                </Flex>
+              )}
             >
               <Button size="small" icon={<UploadOutlined />}>
                 Upload Terms and Conditions
