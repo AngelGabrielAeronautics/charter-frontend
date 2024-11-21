@@ -17,4 +17,22 @@ export interface IAuthState {
   operator?: IOperator;
   redirect: IRedirect;
   notify: INotify;
+  success: {
+    updatePassword: boolean,
+    resetPassword: boolean,
+    createAccount: boolean,
+    authenticate: boolean,
+  };
+  loading: {
+    updatePassword: boolean,
+    resetPassword: boolean,
+    createAccount: boolean,
+    authenticate: boolean,
+  };
+  error: {
+    updatePassword: string | null,
+    resetPassword: string | null,
+    createAccount: string | null,
+    authenticate: string | null,
+  };
 }

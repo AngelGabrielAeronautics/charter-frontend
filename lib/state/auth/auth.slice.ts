@@ -1,5 +1,4 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { FirebaseError } from "firebase/app";
 
 import { eRoutes } from "@/app/(config)/routes";
 
@@ -18,10 +17,6 @@ import {
   updateUserPassword,
 } from "../../firebase/auth.service";
 import { IUser } from "../../models/IUser";
-import {
-  getCurrentOperator,
-  getOperatorById,
-} from "../operators/operators.slice";
 import { RootState } from "../store";
 
 const initialState: IAuthState = {
@@ -37,6 +32,24 @@ const initialState: IAuthState = {
   errorMessage: "",
   redirect: {
     shouldRedirect: false,
+  },
+  success: {
+    updatePassword: false,
+    resetPassword: false,
+    createAccount: false,
+    authenticate: false,
+  },
+  loading: {
+    updatePassword: false,
+    resetPassword: false,
+    createAccount: false,
+    authenticate: false,
+  },
+  error: {
+    updatePassword: null,
+    resetPassword: null,
+    createAccount: null,
+    authenticate: null,
   },
   notify: {
     shouldNotify: false,
@@ -137,6 +150,11 @@ export const AuthSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    resetActionStates: (state) => {
+      state.loading = initialState.loading
+      state.error = initialState.error
+      state.success = initialState.success
+    },
     setAuthenticatedUser: (state, action: PayloadAction<IUser>) => {
       state.authenticatedUser = action.payload;
       state.isAuthenticated = true;
@@ -262,14 +280,20 @@ export const AuthSlice = createSlice({
         state.hasError = true;
         state.errorMessage = errorMessage;
       })
-
-      .addCase(updatePassword.fulfilled, (state, action: any) => {
-        state.updatingPassword = false;
-      })
       .addCase(updatePassword.pending, (state) => {
         state.hasError = false;
         state.errorMessage = "";
         state.updatingPassword = true;
+        // New action state objects
+        state.success.updatePassword = false;
+        state.loading.updatePassword = true;
+        state.error.updatePassword = null;
+      })
+      .addCase(updatePassword.fulfilled, (state, action: any) => {
+        state.updatingPassword = false;
+        // New action state objects
+        state.success.updatePassword = true;
+        state.loading.updatePassword = false;
       })
       .addCase(updatePassword.rejected, (state, action: PayloadAction<any>) => {
         let errorMessage = action.payload.message.toString();
@@ -277,16 +301,18 @@ export const AuthSlice = createSlice({
         state.updatingPassword = false;
         state.hasError = true;
         state.errorMessage = errorMessage;
+
+        // New action state objects
+        state.loading.updatePassword = false;
+        state.error.updatePassword = errorMessage;
       });
   },
 });
 
-export const { setAuthenticatedUser, setRole, setOperator, resetRedirect } =
-  AuthSlice.actions;
+export const { setAuthenticatedUser, setRole, setOperator, resetRedirect, resetActionStates } = AuthSlice.actions;
 
 // Selectors
-export const authenticated_user = (state: RootState) =>
-  state.auth.authenticatedUser;
+export const authenticated_user = (state: RootState) => state.auth.authenticatedUser;
 export const signed_in = (state: RootState) => state.auth.isAuthenticated;
 
 export default AuthSlice.reducer;
