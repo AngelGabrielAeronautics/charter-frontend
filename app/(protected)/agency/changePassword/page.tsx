@@ -3,25 +3,35 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-
-
-import { EyeInvisibleOutlined, EyeTwoTone, QuestionCircleOutlined, UserOutlined } from "@ant-design/icons";
-import { Alert, Button, Divider, Flex, Form, Input, List, Popover, Row, Typography, notification } from "antd";
-
-
+import {
+  EyeInvisibleOutlined,
+  EyeTwoTone,
+  QuestionCircleOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import {
+  Alert,
+  Button,
+  Divider,
+  Flex,
+  Form,
+  Input,
+  List,
+  Popover,
+  Row,
+  Typography,
+  notification,
+} from "antd";
 
 import { eRoutes } from "@/app/(config)/routes";
 import { PageHeader } from "@/app/components";
 
-
-
 import { updatePassword } from "@/lib/state/auth/auth.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 
-
 const { Text } = Typography;
 
-const ChangePasswordComponent = () => {
+const AgencyChangePassword = () => {
   const [form] = Form.useForm();
   const [passwordStrength, setPasswordStrength] = useState<string | null>(null);
   const [passwordRequirementsStatus, setPasswordRequirementsStatus] = useState({
@@ -143,7 +153,10 @@ const ChangePasswordComponent = () => {
             content={
               <div>
                 <h5>What is a Strong Password?</h5>
-                <p>A strong password helps protect your account from unauthorized access</p>
+                <p>
+                  A strong password helps protect your account from unauthorized
+                  access
+                </p>
                 <p>To create a secure password, follow these guidelines:</p>
                 <Divider />
                 <h5>Guidelines</h5>
@@ -324,4 +337,4 @@ const ChangePasswordComponent = () => {
   );
 };
 
-export default ChangePasswordComponent;
+export default AgencyChangePassword;

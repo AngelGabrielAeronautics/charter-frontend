@@ -9,22 +9,18 @@ import {
   MailOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Button, Card, Flex, Form, Input, Row, Tabs, message } from "antd";
-import Password from "antd/es/input/Password";
-import { confirmPasswordReset } from "firebase/auth";
-import { LiaMarkerSolid } from "react-icons/lia";
-import { MdLocationPin } from "react-icons/md";
+import { Button, Flex, Form, Input, Row, Tabs } from "antd";
 
 import { eRoutes } from "@/app/(config)/routes";
 import ClientAppBar from "@/app/components/ClientAppBar";
 
 import { IAddress } from "@/lib/models/IAddress";
 import { IUser } from "@/lib/models/IUser";
-import { signOut, updatePassword } from "@/lib/state/auth/auth.slice";
+import { signOut } from "@/lib/state/auth/auth.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
-import { IUpdateUserDto, updateUser } from "@/lib/state/users/users.slice";
+import { updateUser } from "@/lib/state/users/users.slice";
 
-const formItemStyle = {};
+import ClientChangePassword from "../components/ClientProfile/change-password-component";
 
 const inputStyle = { width: "100%" };
 
@@ -81,7 +77,7 @@ const ClientProfile = () => {
               key: "3",
               label: "ChangePassword",
               icon: <EnvironmentOutlined />,
-              children: <ChangePasswordComponent />,
+              children: <ClientChangePassword />,
             },
           ]}
         />
@@ -108,7 +104,7 @@ const UserSection = ({ authenticatedUser, handleSignOut }: IUserProps) => {
   return (
     <Row className="p-2" style={{ background: "#EBE5DF", borderRadius: 16 }}>
       <Form layout="vertical" style={{ width: "35%" }}>
-        <Form.Item style={formItemStyle} label="First Names">
+        <Form.Item label="First Names">
           <Input
             size="large"
             type="name"
@@ -125,7 +121,7 @@ const UserSection = ({ authenticatedUser, handleSignOut }: IUserProps) => {
             prefix={<UserOutlined style={{ marginRight: ".5rem" }} />}
           />
         </Form.Item>
-        <Form.Item style={formItemStyle} label="Last Name">
+        <Form.Item label="Last Name">
           <Input
             size="large"
             type="name"
@@ -141,7 +137,7 @@ const UserSection = ({ authenticatedUser, handleSignOut }: IUserProps) => {
             prefix={<UserOutlined style={{ marginRight: ".5rem" }} />}
           />
         </Form.Item>
-        <Form.Item style={formItemStyle} label="Email Address">
+        <Form.Item label="Email Address">
           <Input
             size="large"
             type="email"
@@ -155,7 +151,7 @@ const UserSection = ({ authenticatedUser, handleSignOut }: IUserProps) => {
             prefix={<MailOutlined style={{ marginRight: ".5rem" }} />}
           />
         </Form.Item>
-        <Form.Item style={formItemStyle} label="User Type">
+        <Form.Item label="User Type">
           <Input
             size="large"
             autoComplete=""
@@ -213,7 +209,7 @@ const AddressSection = ({
   return (
     <Row className="p-2" style={{ borderRadius: 16 }}>
       <Form layout="vertical" style={{ width: "35%" }}>
-        <Form.Item style={formItemStyle} label="Street Address">
+        <Form.Item label="Street Address">
           <Input
             size="large"
             type="name"
@@ -229,7 +225,7 @@ const AddressSection = ({
             }
           />
         </Form.Item>
-        <Form.Item style={formItemStyle} label="City">
+        <Form.Item label="City">
           <Input
             size="large"
             type="name"
@@ -245,7 +241,7 @@ const AddressSection = ({
             }
           />
         </Form.Item>
-        <Form.Item style={formItemStyle} label="State / Province">
+        <Form.Item label="State / Province">
           <Input
             size="large"
             type="name"
@@ -261,7 +257,7 @@ const AddressSection = ({
             }
           />
         </Form.Item>
-        <Form.Item style={formItemStyle} label="Country">
+        <Form.Item label="Country">
           <Input
             size="large"
             type="name"
@@ -277,7 +273,7 @@ const AddressSection = ({
             }
           />
         </Form.Item>
-        <Form.Item style={formItemStyle} label="Postal Code">
+        <Form.Item label="Postal Code">
           <Input
             size="large"
             type="name"
@@ -304,97 +300,6 @@ const AddressSection = ({
             onClick={handleSignOut}
           >
             SIGN OUT
-          </Button>
-        </Flex>
-      </Form>
-    </Row>
-  );
-};
-
-const ChangePasswordComponent = () => {
-  const [formData, setFormData] = useState({
-    currentPassword: "",
-    password: "",
-    confirmPasswordReset: "",
-  });
-  const dispatch = useAppDispatch();
-
-  const handleUpdatePassword = () => {
-    if (formData.confirmPasswordReset === formData.password) {
-      const payload = {
-        currentPassword: formData.currentPassword,
-        newPassword: formData.password,
-      };
-      dispatch(updatePassword(payload));
-    } else {
-      message.error("passwords do not match");
-    }
-  };
-
-  return (
-    <Row className="p-2" style={{ background: "#EBE5DF", borderRadius: 16 }}>
-      <Form layout="vertical" style={{ width: "35%" }}>
-        <Form.Item style={formItemStyle} label="Current Password">
-          <Input
-            size="large"
-            type="password"
-            className="custom-field-input"
-            placeholder="Current Password"
-            autoComplete=""
-            allowClear
-            onChange={(e) =>
-              setFormData({ ...formData, currentPassword: e.target.value })
-            }
-            // defaultValue={authenticatedUser?.firstNames}
-
-            style={inputStyle}
-            prefix={<UserOutlined style={{ marginRight: ".5rem" }} />}
-          />
-        </Form.Item>
-        <Form.Item style={formItemStyle} label="New Password">
-          <Input
-            size="large"
-            type="password"
-            className="custom-field-input"
-            placeholder="New Password"
-            autoComplete=""
-            allowClear
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-            // defaultValue={authenticatedUser?.firstNames}
-
-            style={inputStyle}
-            prefix={<UserOutlined style={{ marginRight: ".5rem" }} />}
-          />
-        </Form.Item>
-        <Form.Item style={formItemStyle} label="Confirm Password">
-          <Input
-            size="large"
-            type="password"
-            className="custom-field-input"
-            placeholder="Confirm Password"
-            autoComplete=""
-            // defaultValue={authenticatedUser?.lastName}
-            onChange={(e) =>
-              setFormData({ ...formData, confirmPasswordReset: e.target.value })
-            }
-            style={inputStyle}
-            prefix={<UserOutlined style={{ marginRight: ".5rem" }} />}
-          />
-        </Form.Item>
-
-        <Flex gap={16}>
-          <Button style={{ width: "8rem" }} type="primary">
-            SAVE CHANGES
-          </Button>
-          <Button
-            style={{ width: "8rem" }}
-            type="primary"
-            danger
-            onClick={handleUpdatePassword}
-          >
-            Change Password
           </Button>
         </Flex>
       </Form>

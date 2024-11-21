@@ -31,7 +31,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 
 const { Text } = Typography;
 
-const OperatorChangePassword = () => {
+const ClientChangePassword = () => {
   const [form] = Form.useForm();
   const [passwordStrength, setPasswordStrength] = useState<string | null>(null);
   const [passwordRequirementsStatus, setPasswordRequirementsStatus] = useState({
@@ -129,7 +129,7 @@ const OperatorChangePassword = () => {
       notification.success({ message: "Password updated successfully" });
       form.resetFields();
       setPasswordStrength(null);
-      router.replace(eRoutes.operatorDashboard);
+      router.replace(eRoutes.clientFlights);
     }
 
     if (error.updatePassword) {
@@ -337,4 +337,4 @@ const OperatorChangePassword = () => {
   );
 };
 
-export default OperatorChangePassword;
+export default ClientChangePassword;
