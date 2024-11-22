@@ -56,10 +56,10 @@ const AuthenticatedLayout = ({ children }: Props) => {
     return initials.join("");
   };
 
-  useLayoutEffect(() => {
-    if (!isAuthenticated) router.replace(eRoutes.login);
-    return () => {};
-  }, [isAuthenticated]);
+  // useLayoutEffect(() => {
+  //   if (!isAuthenticated) router.replace(eRoutes.login);
+  //   return () => {};
+  // }, [isAuthenticated]);
 
   return (
     <Layout style={layoutStyle} className="authenticated-layout">

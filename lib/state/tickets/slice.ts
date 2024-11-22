@@ -209,6 +209,15 @@ export const slice = createSlice({
       (state, action: PayloadAction<IRecord>) => {
         state.loading.updateRecord = false;
         state.success.updateRecord = true;
+        const updatedTicket = action.payload;
+
+        state.records = state.records.map((item) => {
+          if (item._id === updatedTicket._id) {
+            return updatedTicket;
+          } else {
+            return item;
+          }
+        })
       }
     );
   },

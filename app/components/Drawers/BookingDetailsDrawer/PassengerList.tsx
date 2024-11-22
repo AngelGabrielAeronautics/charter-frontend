@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { Button, Card, Flex, Input, Select, Space, Table, message } from "antd";
+import { Button, Card, Flex, Input, List, Select, Space, message } from "antd";
 
 import { ITicket } from "@/lib/models/ITicket";
 import { IPerson } from "@/lib/models/person.model";
@@ -9,6 +10,8 @@ import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 import { update } from "@/lib/state/tickets/slice";
 
 import { eRoutes } from "../../../(config)/routes";
+import PassengerListForm from "./PassengerListForm";
+import PassengerListLabel from "./PassengerListLabel";
 
 interface Props {}
 
@@ -121,19 +124,23 @@ const PassengerList = ({}: Props) => {
       render: (_: any, record: ITicket, index: number) => {
         if (passengerDetailsComplete(record))
           return (
-            <Button
-              onClick={() => viewTicket(record._id!)}
-              style={{
-                width: "8rem",
-                backgroundColor: "#ebe5df",
-                color: "#886f65",
-                borderColor: "#886f65",
-              }}
-              className="mb-3 mr-6 hover:font-medium"
-              type="primary"
+            <Link
+              target="_blank"
+              href={`${authenticatedUser?.role === "Agency" ? eRoutes.agencyTickets : eRoutes.clientTickets}/${record._id}`}
             >
-              View Ticket
-            </Button>
+              <Button
+                style={{
+                  width: "8rem",
+                  backgroundColor: "#ebe5df",
+                  color: "#886f65",
+                  borderColor: "#886f65",
+                }}
+                className="mb-3 mr-6 hover:font-medium"
+                type="primary"
+              >
+                View Ticket
+              </Button>
+            </Link>
           );
 
         return (
@@ -166,6 +173,8 @@ const PassengerList = ({}: Props) => {
 
   const passengerDetailsComplete = (_ticket: ITicket) => {
     const { passengerDetails } = _ticket;
+
+    console.log(`🚀 ~ ${_ticket.ticketNumber} ~ Passenger Details => `, passengerDetails)
 
     if (!passengerDetails) return false;
     if (!passengerDetails.firstNames) return false;
@@ -237,7 +246,23 @@ const PassengerList = ({}: Props) => {
           backgroundColor: "#f0eae3",
         }}
       >
-        <Table
+        {ticketList && (
+          <List
+            dataSource={ticketList}
+            renderItem={(ticket) => {
+              const shouldRenderPassengerListLabel =
+                passengerDetailsComplete(ticket);
+              console.log(
+                "🚀 ~ PassengerList.tsx:251 ~ shouldRenderPassengerListLabel",
+                shouldRenderPassengerListLabel
+              );
+              if (shouldRenderPassengerListLabel)
+                return <PassengerListLabel ticketId={ticket._id!} />;
+              return <PassengerListForm ticketId={ticket._id!} />;
+            }}
+          />
+        )}
+        {/* <Table
           className="ant-input.custom-field-input"
           dataSource={ticketList}
           columns={columns}
@@ -246,7 +271,7 @@ const PassengerList = ({}: Props) => {
           }
           pagination={false}
           style={{ marginTop: "1rem" }}
-        />
+        /> */}
       </Card>
     </div>
   );

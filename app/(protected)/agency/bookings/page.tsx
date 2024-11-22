@@ -9,19 +9,15 @@ import { Button, Divider, Modal } from "antd";
 import { PageHeader } from "@/app/components";
 import DataTable from "@/app/components/DataTable";
 import BookingDetailsDrawer from "@/app/components/Drawers/BookingDetailsDrawer";
-import CreateFlightDrawer from "@/app/components/Drawers/CreateFlightDrawer";
 
 import { IBooking } from "@/lib/models";
 import { IInvoice } from "@/lib/models/IInvoices";
 import {
-  fetchBookings,
   filterBookings,
   selectBooking,
   update,
 } from "@/lib/state/bookings/bookings.slice";
-import { fetchFlights } from "@/lib/state/flights/flights.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
-import { fetchInvoices } from "@/lib/state/invoices/invoices.slice";
 
 const AgencyBookings = () => {
   const [showDetailsDrawer, setShowDetailsDrawer] = useState(false);
