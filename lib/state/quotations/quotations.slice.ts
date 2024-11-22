@@ -7,6 +7,7 @@ import { IUser } from "@/lib/models/IUser";
 import QuotationService from "@/lib/services/quotation.service";
 
 import { RootState } from "../store";
+import { updateQuotationRequest, updateSelectedRecord } from "../quotationRequests/quotationRequests.slice";
 
 const subject = "quotations";
 const service = new QuotationService();
@@ -86,9 +87,16 @@ export const findOne = createAsyncThunk(
   }
 );
 
+export const findByRequest = createAsyncThunk(
+  `${subject}/findByRequest`,
+  async (id: string) => {
+    return await service.findByRequest(id);
+  }
+);
+
 export const create = createAsyncThunk(
   `${subject}/create`,
-  async (payload: IQuotation, thunk) => {
+  async (payload: IQuotation) => {
     return await service.create(payload);
   }
 );
@@ -96,10 +104,33 @@ export const create = createAsyncThunk(
 export const update = createAsyncThunk(
   `${subject}/update`,
   async (
-    { id, payload }: { id: string; payload: IQuotationUpdateDTO },
-    thunk
+    { id, payload }: { id: string; payload: IQuotationUpdateDTO }
   ) => {
     return await service.update(id, payload as IQuotation);
+  }
+);
+
+export const accept = createAsyncThunk(
+  `${subject}/accept`,
+  async (
+    id: string, thunk
+  ) => {
+    const updatedQuotation = await service.accept(id);
+
+    thunk.dispatch(updateSelectedRecord({
+      status: "Fulfilled"
+    }))
+
+    return updatedQuotation
+  }
+);
+
+export const reject = createAsyncThunk(
+  `${subject}/reject`,
+  async (
+    id: string
+  ) => {
+    return await service.reject(id);
   }
 );
 
@@ -176,6 +207,22 @@ export const QuotationsSlice = createSlice({
         state.quotations = action.payload.reverse();
       }
     );
+    builder.addCase(findByRequest.pending, (state) => {
+      state.loading.listRecords = true;
+      state.error.listRecords = false;
+    });
+    builder.addCase(findByRequest.rejected, (state, action) => {
+      state.loading.listRecords = false;
+      state.error.listRecords = action.error.message;
+    });
+    builder.addCase(
+      findByRequest.fulfilled,
+      (state, action: PayloadAction<IQuotation[]>) => {
+        state.loading.listRecords = false;
+        state.success.listRecords = true;
+        state.quotations = action.payload.reverse();
+      }
+    );
     builder.addCase(filter.pending, (state) => {
       state.loading.listRecords = true;
       state.error.listRecords = false;
@@ -233,6 +280,50 @@ export const QuotationsSlice = createSlice({
     });
     builder.addCase(
       update.fulfilled,
+      (state, action: PayloadAction<IQuotation>) => {
+        state.loading.updateRecord = false;
+        state.success.updateRecord = true;
+        state.selectedQuotation = action.payload;
+        // Update the quotation in the quotations array
+        const index = state.quotations.findIndex(
+          (quotation: IQuotation) => quotation._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.quotations[index] = action.payload;
+        }
+      }
+    );
+    builder.addCase(accept.pending, (state) => {
+      state.loading.updateRecord = true;
+    });
+    builder.addCase(accept.rejected, (state, action) => {
+      state.loading.updateRecord = false;
+      state.error.updateRecord = action.error.message;
+    });
+    builder.addCase(
+      accept.fulfilled,
+      (state, action: PayloadAction<IQuotation>) => {
+        state.loading.updateRecord = false;
+        state.success.updateRecord = true;
+        state.selectedQuotation = action.payload;
+        // Update the quotation in the quotations array
+        const index = state.quotations.findIndex(
+          (quotation: IQuotation) => quotation._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.quotations[index] = action.payload;
+        }
+      }
+    );
+    builder.addCase(reject.pending, (state) => {
+      state.loading.updateRecord = true;
+    });
+    builder.addCase(reject.rejected, (state, action) => {
+      state.loading.updateRecord = false;
+      state.error.updateRecord = action.error.message;
+    });
+    builder.addCase(
+      reject.fulfilled,
       (state, action: PayloadAction<IQuotation>) => {
         state.loading.updateRecord = false;
         state.success.updateRecord = true;

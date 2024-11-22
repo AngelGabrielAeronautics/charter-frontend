@@ -47,6 +47,17 @@ export default class QuotationService {
     return response.json();
   };
 
+  findByRequest = async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}${this.subject}/request/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "GET",
+    });
+
+    return response.json();
+  };
+
   findByFilter = async (payload: any, user?: IUser) => {
     const response = await fetch(`${API_BASE_URL}${this.subject}/`, {
       headers: {
@@ -73,6 +84,28 @@ export default class QuotationService {
       },
       method: "PATCH",
       body: JSON.stringify(payload),
+    });
+
+    return response.json();
+  };
+
+  accept = async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}${this.subject}/${id}/accept`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "PATCH"
+    });
+
+    return response.json();
+  };
+
+  reject = async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}${this.subject}/${id}/reject`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "PATCH"
     });
 
     return response.json();

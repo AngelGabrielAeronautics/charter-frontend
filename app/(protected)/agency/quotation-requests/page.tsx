@@ -3,21 +3,8 @@
 import React, { useEffect, useState } from "react";
 
 import {
-  ArrowUpOutlined,
-  DownCircleFilled,
-  EditFilled,
-  FilterFilled,
-  SearchOutlined,
-} from "@ant-design/icons";
-import {
-  Button,
   Divider,
-  Form,
-  Input,
   Modal,
-  Select,
-  Space,
-  Table,
   TableColumnsType,
 } from "antd";
 
@@ -26,11 +13,8 @@ import QuotationRequestDrawer from "@/app/components/Drawers/QuotationRequestDra
 import { getFormattedDate } from "@/app/helpers/DateHelper";
 
 import { IQuotationRequestUpdateDTO } from "@/lib/models/IQuotationRequest";
-import { IUser } from "@/lib/models/IUser";
-import { IAirport } from "@/lib/models/airport.model";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 import {
-  fetchQuotationRequests,
   filterQuotationRequests,
   selectRecord,
   updateQuotationRequest,

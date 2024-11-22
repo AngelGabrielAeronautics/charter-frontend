@@ -129,6 +129,22 @@ export const QuotationRequestSlice = createSlice({
     selectRecord: (state, action) => {
       state.selectedQuotationRequest = action.payload;
     },
+    deselectRecord: (state) => {
+      state.selectedQuotationRequest = undefined;
+    },
+    updateSelectedRecord: (state, action) => {
+      const updatedRequest = {
+        ...state.selectedQuotationRequest,
+        ...action.payload
+      };
+      state.selectedQuotationRequest = updatedRequest
+
+      const updatedQuotationRequests = [...state.quotationRequests];
+      const index = updatedQuotationRequests.findIndex((item) => item._id === state.selectedQuotationRequest?._id)
+      updatedQuotationRequests[index] = updatedRequest;
+
+      state.quotationRequests = updatedQuotationRequests;
+    },
     resetActionStates: (state) => {
       state.loading = initialState.loading;
       state.success = initialState.success;
@@ -211,7 +227,7 @@ export const QuotationRequestSlice = createSlice({
   },
 });
 
-export const { resetActionStates, selectRecord } =
+export const { resetActionStates, selectRecord, deselectRecord, updateSelectedRecord } =
   QuotationRequestSlice.actions;
 
 export default QuotationRequestSlice.reducer;

@@ -1,56 +1,25 @@
 import Image from "next/image";
 import { CSSProperties, useEffect, useState } from "react";
 
-import {
-  CheckCircleOutlined,
-  EnvironmentOutlined,
-  InfoCircleOutlined,
-} from "@ant-design/icons";
-import {
-  Button,
-  Card,
-  Cascader,
-  Col,
-  DatePicker,
-  Descriptions,
-  Divider,
-  Drawer,
-  Flex,
-  Form,
-  Input,
-  InputNumber,
-  List,
-  Modal,
-  Rate,
-  Row,
-  Select,
-  Space,
-  Switch,
-  Tag,
-  TimePicker,
-  Typography,
-  notification,
-} from "antd";
+
+
+import { CheckCircleOutlined, EnvironmentOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { Button, Card, Cascader, Col, DatePicker, Descriptions, Divider, Drawer, Flex, Form, Input, InputNumber, List, Modal, Rate, Row, Select, Space, Switch, Tag, TimePicker, Typography, notification } from "antd";
 import dayjs from "dayjs";
 import { IoMdDownload } from "react-icons/io";
 import short from "short-uuid";
 
-import {
-  formatToMoneyWithCurrency,
-  formatUCTtoISO,
-  getTimeFromDate,
-} from "@/lib/helpers/formatters.helpers";
+
+
+import { formatToMoneyWithCurrency, formatUCTtoISO, getTimeFromDate } from "@/lib/helpers/formatters.helpers";
+import { IAsset } from "@/lib/models/IAssets";
 import { IOperator } from "@/lib/models/IOperators";
 import { IQuotationRequestUpdateDTO } from "@/lib/models/IQuotationRequest";
-import { IQuotationUpdateDTO } from "@/lib/models/IQuotations";
+import { IQuotation, IQuotationUpdateDTO } from "@/lib/models/IQuotations";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
-import { updateQuotationRequest } from "@/lib/state/quotationRequests/quotationRequests.slice";
-import {
-  create,
-  resetActionStates,
-  setSelectedQuotation,
-  update,
-} from "@/lib/state/quotations/quotations.slice";
+import { deselectRecord, updateQuotationRequest } from "@/lib/state/quotationRequests/quotationRequests.slice";
+import { accept, create, filter, findByRequest, reject, resetActionStates, setSelectedQuotation, update } from "@/lib/state/quotations/quotations.slice";
+
 
 const inputStyle: CSSProperties = { width: "100%" };
 
@@ -61,10 +30,11 @@ const QuotationRequestDrawer = ({
   open: boolean;
   setOpen: (arg: boolean) => void;
 }) => {
+  const [form] = Form.useForm();
+
   const [operatorDetailsVisible, setOperatorDetailsVisible] = useState(false);
   const [operatorDetails, setOperatorDetails] = useState<IOperator>();
   const [quotationFormVisible, setQuotationFormVisible] = useState(false);
-  const [form] = Form.useForm();
 
   const { authenticatedUser } = useAppSelector((state) => state.auth);
   const { quotations, loading, success, selectedQuotation } = useAppSelector(
@@ -89,13 +59,11 @@ const QuotationRequestDrawer = ({
   };
 
   const acceptQuote = (id: string) => {
-    const payload: IQuotationUpdateDTO = { status: "Accepted" };
-    dispatch(update({ id, payload }));
+    dispatch(accept(id));
   };
 
   const rejectQuote = (id: string) => {
-    const payload: IQuotationUpdateDTO = { status: "Rejected" };
-    dispatch(update({ id, payload }));
+    dispatch(reject(id));
   };
 
   const showOperatorDetails = (operator: IOperator) => {
@@ -158,6 +126,12 @@ const QuotationRequestDrawer = ({
     return () => {};
   }, [success.updateRecord, selectedQuotation, dispatch]);
 
+  useEffect(() => {
+    if (selectedQuotationRequest && selectedQuotationRequest._id) {
+      dispatch(findByRequest(selectedQuotationRequest._id));
+    }
+  }, [selectedQuotationRequest, dispatch]);
+
   const submittedQuotation = () => {
     return quotations.find(
       (quotation) =>
@@ -171,7 +145,10 @@ const QuotationRequestDrawer = ({
       title="Quotation Request"
       placement="right"
       width={800}
-      onClose={() => setOpen(false)}
+      onClose={() => {
+        setOpen(false);
+        dispatch(deselectRecord())
+      }}
       open={open}
       extra={
         <Space>
@@ -281,125 +258,132 @@ const QuotationRequestDrawer = ({
         loading={loading.listRecords}
         itemLayout="horizontal"
         dataSource={quotations}
-        renderItem={(item, index) => (
-          <List.Item key={item._id}>
-            <List.Item.Meta
-              avatar={
-                <Image
-                  alt="Aircraft Feature Image"
-                  width={60}
-                  height={60}
-                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/OO-FLN.JPG/800px-OO-FLN.JPG"
-                  style={{ borderRadius: 8 }}
-                />
-              }
-              title={
-                <Flex justify="space-between">
-                  <span>{item.quotationNumber}</span>
-                  <Tag
-                    color={
-                      item.status == "Accepted"
-                        ? "success"
-                        : item.status == "Rejected"
-                          ? "error"
-                          : "blue"
-                    }
-                  >
-                    {item.status}
-                  </Tag>
-                </Flex>
-              }
-              description={
-                <div className="mt-2">
-                  <Descriptions
-                    size="small"
-                    items={[
-                      {
-                        key: "Operator",
-                        label: "Operator",
-                        span: 3,
-                        children: (
-                          <Flex>
-                            <span>
-                              {typeof item.operatorId == "object"
-                                ? item.operatorId.airline
-                                : item.operatorId}
-                            </span>
-                            <InfoCircleOutlined
-                              className="ml-2"
-                              onClick={() =>
-                                showOperatorDetails(
-                                  item.operatorId as IOperator
-                                )
-                              }
-                            />
-                          </Flex>
-                        ),
-                      },
-                      {
-                        key: "Aircraft",
-                        label: "Aircraft",
-                        span: 3,
-                        children: (
-                          <span>
-                            {typeof item.aircraftId == "object"
-                              ? item.aircraftId?.manufacturer
-                              : item.aircraftId}
-                            {" - "}
-                            {typeof item.aircraftId == "object"
-                              ? item.aircraftId?.model
-                              : item.aircraftId}
-                          </span>
-                        ),
-                      },
-                      {
-                        key: "Validity",
-                        label: "Valid Until",
-                        span: 2,
-                        children: (
-                          <>
-                            {formatUCTtoISO(item.expirationDate.toString())}{" "}
-                            {getTimeFromDate(item.expirationDate.toString())}
-                          </>
-                        ),
-                      },
-                      {
-                        key: "Price",
-                        label: "Price",
-                        span: 1,
-                        children: (
-                          <>{formatToMoneyWithCurrency(item.price.amount)}</>
-                        ),
-                      },
-                    ]}
-                  />
-                  {item.status == "Submitted" &&
-                    authenticatedUser?.role != "Operator" && (
-                      <Flex justify="start" gap={16} className="mt-4">
-                        <Button
-                          type="primary"
-                          size="small"
-                          style={{ padding: "14px 1rem" }}
-                          onClick={() => acceptQuote(item._id!)}
-                        >
-                          Accept
-                        </Button>
-                        <Button
-                          type="primary"
-                          size="small"
-                          style={{ padding: "14px 1rem" }}
-                          onClick={() => rejectQuote(item._id!)}
-                          danger
-                        >
-                          Reject
-                        </Button>
-                      </Flex>
-                    )}
-                </div>
-              }
+        renderItem={(item: IQuotation, index) => {
+          const aircraft = item.aircraftId as IAsset;
+
+          const images = aircraft?.images || [];
+          const featureImage = images[0] ? (
+            <Image
+              alt={images[0].name}
+              width={60}
+              height={60}
+              src={`data:${images[0].mimetype};base64,${images[0].data}`}
+              style={{ borderRadius: 8 }}
             />
-          </List.Item>
-        )}
+          ) : undefined;
+
+          return (
+            <List.Item key={item._id}>
+              <List.Item.Meta
+                avatar={featureImage}
+                title={
+                  <Flex justify="space-between">
+                    <span>{item.quotationNumber}</span>
+                    <Tag
+                      color={
+                        item.status == "Accepted"
+                          ? "success"
+                          : item.status == "Rejected"
+                            ? "error"
+                            : "blue"
+                      }
+                    >
+                      {item.status}
+                    </Tag>
+                  </Flex>
+                }
+                description={
+                  <div className="mt-2">
+                    <Descriptions
+                      size="small"
+                      items={[
+                        {
+                          key: "Operator",
+                          label: "Operator",
+                          span: 3,
+                          children: (
+                            <Flex>
+                              <span>
+                                {typeof item.operatorId == "object"
+                                  ? item.operatorId.airline
+                                  : item.operatorId}
+                              </span>
+                              <InfoCircleOutlined
+                                className="ml-2"
+                                onClick={() =>
+                                  showOperatorDetails(
+                                    item.operatorId as IOperator
+                                  )
+                                }
+                              />
+                            </Flex>
+                          ),
+                        },
+                        {
+                          key: "Aircraft",
+                          label: "Aircraft",
+                          span: 3,
+                          children: (
+                            <span>
+                              {typeof item.aircraftId == "object"
+                                ? item.aircraftId?.manufacturer
+                                : item.aircraftId}
+                              {" - "}
+                              {typeof item.aircraftId == "object"
+                                ? item.aircraftId?.model
+                                : item.aircraftId}
+                            </span>
+                          ),
+                        },
+                        {
+                          key: "Validity",
+                          label: "Valid Until",
+                          span: 2,
+                          children: (
+                            <>
+                              {formatUCTtoISO(item.expirationDate.toString())}{" "}
+                              {getTimeFromDate(item.expirationDate.toString())}
+                            </>
+                          ),
+                        },
+                        {
+                          key: "Price",
+                          label: "Price",
+                          span: 1,
+                          children: (
+                            <>{formatToMoneyWithCurrency(item.price.amount)}</>
+                          ),
+                        },
+                      ]}
+                    />
+                    {item.status == "Submitted" &&
+                      authenticatedUser?.role != "Operator" && (
+                        <Flex justify="start" gap={16} className="mt-4">
+                          <Button
+                            type="primary"
+                            size="small"
+                            style={{ padding: "14px 1rem" }}
+                            onClick={() => acceptQuote(item._id!)}
+                          >
+                            Accept
+                          </Button>
+                          <Button
+                            type="primary"
+                            size="small"
+                            style={{ padding: "14px 1rem" }}
+                            onClick={() => rejectQuote(item._id!)}
+                            danger
+                          >
+                            Reject
+                          </Button>
+                        </Flex>
+                      )}
+                  </div>
+                }
+              />
+            </List.Item>
+          );
+        }}
       />
       <Drawer
         title="Operator Details"
