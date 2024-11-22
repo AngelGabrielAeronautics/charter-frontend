@@ -5,16 +5,19 @@ import { eRoutes } from "@/app/(config)/routes";
 import { IAuthState } from "@/lib/models/IAuth.model";
 import { IOperator } from "@/lib/models/IOperators";
 
+import { auth } from "@/lib/firebase/firebase";
+import { checkActionCode, confirmPasswordReset } from "firebase/auth";
 import {
   IFederatedUser,
+  IPasswordResetPayload,
   ISignInPayload,
   ISignUpPayload,
   clearSession,
   createFirebaseAccount,
   handleFederatedAccountSignIn,
-  resetFirebasePassword,
+  sendResetPasswordLink,
   signIn,
-  updateUserPassword,
+  updateUserPassword
 } from "../../firebase/auth.service";
 import { IUser } from "../../models/IUser";
 import { RootState } from "../store";
@@ -98,20 +101,56 @@ export const createFederatedAccount = createAsyncThunk(
     try {
       const result = await handleFederatedAccountSignIn(userData);
 
-      if (!result) return false;
+      if (result.hasError) throw new Error("Password reset failed", {
+        cause: result.error,
+      });
 
       return result;
     } catch (error: any) {
-      return false;
+      throw new Error("Password reset failed", {
+        cause: error
+      });
     }
   }
 );
 
-export const resetPassword = createAsyncThunk(
+export const resetUserPassword = createAsyncThunk(
   "auth/resetPassword",
+  async (payload: IPasswordResetPayload, thunkAPI) => {
+    const { oobCode, newPassword } = payload;
+
+    try {
+      await checkActionCode(auth, oobCode)
+        .then((info) => {
+          // Action code is valid.
+          console.log(info)
+        })
+        .catch((err) => {
+          // Handle error.
+          return thunkAPI.rejectWithValue({
+            message: 'Password reset failed due to invalid action code',
+            error: err
+          });
+        });
+
+      await confirmPasswordReset(auth, oobCode, newPassword)
+        .then(() => {
+          return { message: 'Password successfully reset' }
+        })
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue({
+        message: err.code == 'auth/invalid-action-code' ? 'Password reset failed due to invalid action code' : 'Password reset failed due to an unknown error',
+        error: err.message
+      });
+    }
+  }
+);
+
+export const sendFirebaseResetPasswordLink = createAsyncThunk(
+  "auth/sendResetPasswordLink",
   async (email: string) => {
     try {
-      const result = await resetFirebasePassword(email);
+      const result = await sendResetPasswordLink(email);
 
       if (!result) return false;
 
@@ -201,17 +240,17 @@ export const AuthSlice = createSlice({
         state.isAuthenticated = true;
         state.authenticatedUser = action.payload.user;
       })
-      .addCase(resetPassword.pending, (state) => {
+      .addCase(sendFirebaseResetPasswordLink.pending, (state) => {
         state.resettingPassword = true;
         state.hasError = false;
         state.errorMessage = "";
       })
-      .addCase(resetPassword.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(sendFirebaseResetPasswordLink.rejected, (state, action: PayloadAction<any>) => {
         state.resettingPassword = false;
         state.hasError = true;
         state.errorMessage = action.payload.error.message;
       })
-      .addCase(resetPassword.fulfilled, (state) => {
+      .addCase(sendFirebaseResetPasswordLink.fulfilled, (state) => {
         state.resettingPassword = false;
         state.redirect = { shouldRedirect: true, redirectPath: eRoutes.login };
       })
@@ -305,6 +344,21 @@ export const AuthSlice = createSlice({
         // New action state objects
         state.loading.updatePassword = false;
         state.error.updatePassword = errorMessage;
+      })
+      .addCase(resetUserPassword.pending, (state) => {
+        state.success.updatePassword = false;
+        state.loading.updatePassword = true;
+        state.error.updatePassword = null;
+      })
+      .addCase(resetUserPassword.fulfilled, (state, action: any) => {
+        console.log("resetUserPassword ~ fulfilled ~ action", action)
+        state.success.updatePassword = true;
+        state.loading.updatePassword = false;
+      })
+      .addCase(resetUserPassword.rejected, (state, action: any) => {
+        console.log("resetUserPassword ~ rejected ~ action", action)
+        state.loading.updatePassword = false;
+        state.error.updatePassword = action.payload.message;
       });
   },
 });

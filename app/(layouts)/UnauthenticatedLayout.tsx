@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
+import React, { Suspense } from "react";
 
-import { Avatar, Layout, Menu, Space } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+import { Avatar, Flex, Layout, Menu, Result, Space, Spin } from "antd";
 
 const { Header, Content, Footer } = Layout;
 
@@ -48,21 +49,27 @@ const footerStyle: React.CSSProperties = {
 const UnauthenticatedLayout = ({ children }: Props) => {
   return (
     <Layout style={layoutStyle}>
-      {/* <Header style={headerStyle}>
-				<Space>
-					<Avatar>U</Avatar>
-				</Space>
-			</Header> */}
-      <Content style={contentStyle}>{children}</Content>
-      {/* <Footer style={footerStyle}>
-				<strong>
-					Developed by{" "}
-					<a style={{ color: "#053C5B" }} target='_blank' href='https://levaretech.com'>
-						LevTech
-					</a>{" "}
-					© 2024
-				</strong>
-			</Footer> */}
+      <Content style={contentStyle}>
+        <Suspense
+          fallback={
+            <Flex justify="center" align="center" className="h-full w-full">
+              <Result
+                icon={
+                  <Spin
+                    indicator={
+                      <LoadingOutlined style={{ fontSize: 48 }} spin />
+                    }
+                  />
+                }
+                title="Loading..."
+                subTitle="Please wait while we set things up"
+              />
+            </Flex>
+          }
+        >
+          {children}
+        </Suspense>
+      </Content>
     </Layout>
   );
 };

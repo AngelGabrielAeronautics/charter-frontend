@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { MailOutlined } from "@ant-design/icons";
 import { Button, Col, Divider, Form, Input, Row } from "antd";
@@ -12,10 +12,11 @@ import { eRoutes } from "@/app/(config)/routes";
 import UnauthenticatedLayout from "@/app/(layouts)/UnauthenticatedLayout";
 import { AppLogo } from "@/app/components/CustomIcon";
 
-import { resetPassword, resetRedirect } from "@/lib/state/auth/auth.slice";
+import {
+  resetRedirect,
+  sendFirebaseResetPasswordLink,
+} from "@/lib/state/auth/auth.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
-
-const formItemStyle = {};
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState<string>("");
@@ -68,12 +69,12 @@ const ForgotPassword = () => {
     return () => {};
   }, [redirect, router]);
 
-  const handlePasswordReset = async () => {
+  const handleSendPasswordResetLink = async () => {
     if (!email) {
       setMessage("Please enter your email address.");
       return;
     } else {
-      dispatch(resetPassword(email));
+      dispatch(sendFirebaseResetPasswordLink(email));
     }
   };
 
@@ -89,18 +90,18 @@ const ForgotPassword = () => {
               layout="vertical"
               name="sign-in-form"
               className="w-full self-center text-start"
-              onFinish={handlePasswordReset}
+              onFinish={handleSendPasswordResetLink}
             >
               <Link href={eRoutes.homePage}>
                 <AppLogo />
               </Link>
-              <h2 className="mb-2">Reset Password</h2>
+              <h2 className="mb-2">Send Reset Password Link</h2>
               <p>
                 Enter the email associated with your account below and we will
-                send a password reset email.
+                send a password reset link to the specified email address.
               </p>
               <Divider />
-              <Form.Item style={formItemStyle} label="Email Address">
+              <Form.Item label="Email Address">
                 <Input
                   className="custom-field-input"
                   variant="filled"
@@ -113,7 +114,7 @@ const ForgotPassword = () => {
                   prefix={<MailOutlined style={{ marginRight: ".5rem" }} />}
                 />
               </Form.Item>
-              <Form.Item style={formItemStyle}>
+              <Form.Item>
                 <Button
                   type="primary"
                   block

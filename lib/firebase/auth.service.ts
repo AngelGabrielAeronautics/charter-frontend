@@ -1,16 +1,14 @@
-import Password from "antd/es/input/Password";
 import {
-  AuthCredential,
   EmailAuthProvider,
   UserCredential,
   browserLocalPersistence,
+  confirmPasswordReset,
   createUserWithEmailAndPassword,
-  getAuth,
   reauthenticateWithCredential,
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
-  updatePassword,
+  updatePassword
 } from "firebase/auth";
 
 import { setUserData } from "../helpers/cookies.helpers";
@@ -20,9 +18,9 @@ import {
   ICreateUserDto,
   createFederatedUser,
   createUser,
-  getUserByEmail,
-  getUserByFID,
+  getUserByEmail
 } from "./users.service";
+import { FirebaseError } from "firebase/app";
 
 export interface IFederatedUser {
   email: string;
@@ -47,6 +45,11 @@ export interface ISignUpPayload {
   password: string;
   firstNames: string;
   lastName: string;
+}
+
+export interface IPasswordResetPayload {
+  oobCode: string;
+  newPassword: string;
 }
 
 export async function signIn({
@@ -79,9 +82,24 @@ export async function signIn({
   }
 }
 
-export async function resetFirebasePassword(email: string): Promise<any> {
+export async function resetPassword(payload: IPasswordResetPayload): Promise<any> {
+  const { oobCode, newPassword } = payload;
+
   try {
-    const response = await sendPasswordResetEmail(auth, email);
+    await confirmPasswordReset(auth, oobCode, newPassword)
+    .then(() => {
+      return { hasError: false }
+    })
+  } catch (err) {
+    return { hasError: true, error: err }
+  }
+}
+
+export async function sendResetPasswordLink(email: string): Promise<any> {
+  try {
+    const response = await sendPasswordResetEmail(auth, email, {
+      url: process.env.NEXT_PUBLIC_RESET_PASSWORD_CONTINUE_URL || '',
+    });
     return response;
   } catch (error) {
     return { success: false, error };
