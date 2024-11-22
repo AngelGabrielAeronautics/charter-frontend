@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 
-import { Button, Card, Descriptions, Flex, Form, Input, Select } from "antd";
+import { Button, Flex, Form } from "antd";
 
 import { eRoutes } from "@/app/(config)/routes";
 
-import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
+import { useAppSelector } from "@/lib/state/hooks";
 
 const PassengerListLabel = ({ ticketId }: { ticketId: string }) => {
   const { records: tickets } = useAppSelector((state) => state.tickets);
@@ -15,23 +15,6 @@ const PassengerListLabel = ({ ticketId }: { ticketId: string }) => {
   const { authenticatedUser } = useAppSelector((state) => state.auth);
 
   if (!ticket) return <p>Ticket with ID {ticketId} not found...</p>;
-
-  // return (
-  //   <Card>
-  //     <Descriptions layout="vertical">
-  //       <Descriptions.Item label="Passenger Name">
-  //         {ticket.passengerDetails?.firstNames}{" "}
-  //         {ticket.passengerDetails?.lastName}
-  //       </Descriptions.Item>
-  //       <Descriptions.Item label="Passport #">
-  //         {ticket.passengerDetails?.passportNumber}
-  //       </Descriptions.Item>
-  //       <Descriptions.Item label="Gender">
-  //         {ticket.passengerDetails?.gender}
-  //       </Descriptions.Item>
-  //     </Descriptions>
-  //   </Card>
-  // );
 
   return (
     <Form layout="vertical">

@@ -256,24 +256,6 @@ const BookingDetailsDrawer: React.FC<BookingsDetailProps> = ({
     };
   };
 
-  const addPassengerDetails = () => {
-    // Function to add a new passenger (you can expand this with a form/modal)
-    setPassengers([
-      ...passengers,
-      {
-        firstNames: "",
-        lastName: "",
-        gender: "male",
-      },
-    ]);
-  };
-
-  const data = passengers.map((passenger, index) => ({
-    key: index,
-    firstName: passenger.firstNames || "N/A",
-    lastName: passenger.lastName || "N/A",
-  }));
-
   const cancelBooking = () => {
     const data = {
       id: selectedBooking?._id!,
@@ -515,7 +497,6 @@ const BookingDetailsDrawer: React.FC<BookingsDetailProps> = ({
           </Row>
         </Row>
         <PassengerList />
-        {/* Operator Section */}
         <h3 style={{ marginTop: 30 }}>Operator</h3>
         <Card
           style={{
