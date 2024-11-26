@@ -1,11 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { VoidFunctionComponent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Button,
-  Card,
   Checkbox,
   Col,
   DatePicker,
@@ -21,7 +20,6 @@ import {
   Switch,
   TimePicker,
   TimePickerProps,
-  message,
   notification,
 } from "antd";
 import { useForm } from "antd/es/form/Form";
@@ -34,22 +32,12 @@ import SearchSelectAirport from "@/app/components/SearchSelectAirport";
 import { IAsset } from "@/lib/models/IAssets";
 import { IAirport } from "@/lib/models/airport.model";
 import { IFlight } from "@/lib/models/flight.model";
-import { fetchAssets, filter } from "@/lib/state/assets/assets.slice";
+import { filter } from "@/lib/state/assets/assets.slice";
 import {
-  addFlightThunk,
   resetActionStates,
-  updateFlight,
   updateFlightThunk,
 } from "@/lib/state/flights/flights.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
-
-const powerPlants = [
-  "Turbofan Engine",
-  "Turbojet Engine",
-  "Turboprop Engine",
-  "Electric Jet Engine",
-  "Ramjet Engine",
-];
 
 const formItemStyle = { width: "100%" };
 
@@ -82,8 +70,6 @@ const UpdateDeadLegForm = ({ selectedFlight, onClose }: IProps) => {
         .add(values.duration, "hours")
         .add(values.duration, "minutes");
       return _arrivalDate;
-    } else {
-      return undefined;
     }
   }, form);
 
@@ -91,7 +77,7 @@ const UpdateDeadLegForm = ({ selectedFlight, onClose }: IProps) => {
 
   const { authenticatedUser } = useAppSelector((state) => state.auth);
   const { assets } = useAppSelector((state) => state.assets);
-  const { flights, loading, success, error } = useAppSelector(
+  const { loading, success } = useAppSelector(
     (state) => state.flights
   );
 

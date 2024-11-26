@@ -91,8 +91,10 @@ const Flights = () => {
             (flight) => flight._id === selectedFlight
           );
           setSelectedFlight(flight);
+          if (flight) dispatch(selectFlight(flight));
         } else {
           setSelectedFlight(selectedFlight);
+          dispatch(selectFlight(selectedFlight));
         }
       }
 

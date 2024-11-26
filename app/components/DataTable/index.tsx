@@ -142,7 +142,7 @@ const DataTable = ({
   const rowSelection = {
     selectedRowKeys,
     fixed: true,
-    onChange: onSelectChange,
+    onChange: onSelectChange
   };
 
   // Bulk delete action
