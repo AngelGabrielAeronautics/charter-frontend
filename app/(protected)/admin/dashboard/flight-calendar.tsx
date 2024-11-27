@@ -1,32 +1,36 @@
 import React, { useState } from "react";
 
-
-
 import { ExpandAltOutlined } from "@ant-design/icons";
-import { Avatar, Badge, BadgeProps, Calendar, CalendarProps, Empty, Flex, List } from "antd";
+import {
+  Avatar,
+  Badge,
+  BadgeProps,
+  Button,
+  Calendar,
+  CalendarProps,
+  Empty,
+  Flex,
+  List,
+} from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import VirtualList from "rc-virtual-list";
 import { BiSolidPlane } from "react-icons/bi";
 
-
-
 import AdminFlightDetailsDrawer from "@/app/components/Drawers/AdminFlightDetailsDrawer";
-
-
 
 import { IFlight } from "@/lib/models/flight.model";
 import { selectFlight } from "@/lib/state/flights/flights.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 
-
-
 import { FlightsItem } from "../../operator/dashboard/page";
 
-
 const ContainerHeight = 200;
-const notificationContainerHeight = 523;
 
-const FlightCalendar = () => {
+const FlightCalendar = ({
+  showFullCalendar,
+}: {
+  showFullCalendar: () => void;
+}) => {
   const [selectedDate, setSelectedDate] = useState(() => dayjs());
   const [visibleFlights, setVisibleFlights] = useState<IFlight[]>([]);
   const [flightDetailsOpen, setFlightDetailsOpen] = useState<boolean>(false);
@@ -36,15 +40,15 @@ const FlightCalendar = () => {
   const dispatch = useAppDispatch();
 
   const onDateSelect = (date: Dayjs) => {
-    setSelectedDate(date);
+  setSelectedDate(date);
 
-    // Set visibleFlights from flights on selected date
-    const filteredFlights = flights.filter((flight) =>
-      dayjs(flight.departure).isAfter(date)
-    );
+  // Filter flights matching the selected date
+  const filteredFlights = flights.filter((flight) =>
+    dayjs(flight.departure).isSame(date, 'day')
+  );
 
-    setVisibleFlights(filteredFlights);
-  };
+  setVisibleFlights(filteredFlights);
+};
 
   const onPanelChange = (
     value: Dayjs,
@@ -107,11 +111,11 @@ const FlightCalendar = () => {
     return listData || [];
   };
 
-const getMonthData = (value: Dayjs) => {
-  if (value.month() === 8) {
-    return 1394;
-  }
-};
+  const getMonthData = (value: Dayjs) => {
+    if (value.month() === 8) {
+      return 1394;
+    }
+  };
 
   const monthCellRender = (value: Dayjs) => {
     const num = getMonthData(value);
@@ -149,11 +153,14 @@ const getMonthData = (value: Dayjs) => {
     <div>
       <Flex justify="space-between">
         <h4>Flight Calendar</h4>
-        <ExpandAltOutlined
+        <div
+          className="h-fit cursor-pointer rounded-md bg-sandstone-40 px-[4px] hover:bg-light-primary hover:text-white"
           onClick={() => {
-            setIsFullScreen(false);
+            showFullCalendar();
           }}
-        />
+        >
+          <ExpandAltOutlined />
+        </div>
       </Flex>
       <Calendar
         fullscreen={isFullScreen}

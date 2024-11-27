@@ -1,50 +1,61 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
-import { ExpandAltOutlined } from "@ant-design/icons";
-import {
-  Avatar,
-  Badge,
-  BadgeProps,
-  Calendar,
-  CalendarProps,
-  Empty,
-  Flex,
-  List,
-} from "antd";
+
+
+import { ShrinkOutlined } from "@ant-design/icons";
+import { Avatar, Badge, BadgeProps, Calendar, CalendarProps, Card, Col, Divider, Empty, Flex, List, Row } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import VirtualList from "rc-virtual-list";
 import { BiSolidPlane } from "react-icons/bi";
 
+
+
 import AdminFlightDetailsDrawer from "@/app/components/Drawers/AdminFlightDetailsDrawer";
+
+
 
 import { IFlight } from "@/lib/models/flight.model";
 import { selectFlight } from "@/lib/state/flights/flights.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 
+
+
 import { FlightsItem } from "../../operator/dashboard/page";
 
-const ContainerHeight = 200;
-const notificationContainerHeight = 523;
 
-const FullCalendar = () => {
+const FullCalendar = ({
+  hideFullCalendar,
+}: {
+  hideFullCalendar: () => void;
+}) => {
   const [selectedDate, setSelectedDate] = useState(() => dayjs());
   const [visibleFlights, setVisibleFlights] = useState<IFlight[]>([]);
   const [flightDetailsOpen, setFlightDetailsOpen] = useState<boolean>(false);
-  const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
 
   const { selectedFlight, flights } = useAppSelector((state) => state.flights);
   const dispatch = useAppDispatch();
 
-  const onDateSelect = (date: Dayjs) => {
+  const onDateSelect = (date: Dayjs, info: { source: string }) => {
     setSelectedDate(date);
 
-    // Set visibleFlights from flights on selected date
-    const filteredFlights = flights.filter((flight) =>
-      dayjs(flight.departure).isAfter(date)
-    );
+    let filteredFlights: IFlight[] = [];
+
+    if (info.source === "month") {
+      // Filter flights in the selected month
+      filteredFlights = flights.filter((flight) =>
+        dayjs(flight.departure).isSame(date, "month")
+      );
+    } else if (info.source === "date") {
+      // Filter flights on the selected date
+      filteredFlights = flights.filter((flight) =>
+        dayjs(flight.departure).isSame(date, "day")
+      );
+    }
 
     setVisibleFlights(filteredFlights);
+    console.log("Filtered Flights:", filteredFlights);
   };
+
 
   const onPanelChange = (
     value: Dayjs,
@@ -77,34 +88,12 @@ const FullCalendar = () => {
   };
 
   const getListData = (value: Dayjs) => {
-    let listData: { type: string; content: string }[] = []; // Specify the type of listData
-    switch (value.date()) {
-      case 8:
-        listData = [
-          { type: "warning", content: "This is warning event." },
-          { type: "success", content: "This is usual event." },
-        ];
-        break;
-      case 10:
-        listData = [
-          { type: "warning", content: "This is warning event." },
-          { type: "success", content: "This is usual event." },
-          { type: "error", content: "This is error event." },
-        ];
-        break;
-      case 15:
-        listData = [
-          { type: "warning", content: "This is warning event" },
-          { type: "success", content: "This is very long usual event......" },
-          { type: "error", content: "This is error event 1." },
-          { type: "error", content: "This is error event 2." },
-          { type: "error", content: "This is error event 3." },
-          { type: "error", content: "This is error event 4." },
-        ];
-        break;
-      default:
-    }
-    return listData || [];
+    return flights
+      .filter((flight) => dayjs(flight.departure).isSame(value, "day"))
+      .map((flight: IFlight) => ({
+        type: "success",
+        content: `${flight.flightNumber}`,
+      }));
   };
 
   const getMonthData = (value: Dayjs) => {
@@ -124,7 +113,7 @@ const FullCalendar = () => {
   };
 
   const dateCellRender = (value: Dayjs) => {
-    const listData = getListData(value);
+    const listData = getListData(value) || [];
     return (
       <ul className="events">
         {listData.map((item) => (
@@ -146,72 +135,89 @@ const FullCalendar = () => {
   };
 
   return (
-    <div>
-      <Flex justify="space-between">
-        <h4>Flight Calendar</h4>
-        <ExpandAltOutlined
-          onClick={() => {
-            setIsFullScreen(false);
-          }}
-        />
-      </Flex>
-      <Calendar
-        fullscreen={isFullScreen}
-        value={selectedDate}
-        onSelect={onDateSelect}
-        onPanelChange={onPanelChange}
-      />
-      <List>
-        {visibleFlights.length > 0 ? (
-          <VirtualList
-            data={visibleFlights.map((flight) => ({
-              id: flight._id!,
-              key: flight._id!,
-              name: `${flight.flightNumber}`,
-              flightReady: isFlightReady(flight),
-              departureTime: dayjs(flight.departure).format("HH:mm"),
-              icon: <BiSolidPlane />,
-            }))}
-            height={ContainerHeight}
-            itemHeight={47}
-            itemKey="id"
-          >
-            {(item: FlightsItem) => (
-              <List.Item
-                key={item.name}
-                className={`flight-calendar-list-item cursor-pointer hover:bg-light-primary ${item.id == selectedFlight?._id ? "selected" : ""}`}
+    <div className="max-h-full overflow-hidden">
+      <Row gutter={16}>
+        <Col span={18}>
+          <Card className="card" style={{ backgroundColor: "#ebe5df" }}>
+            <Flex justify="space-between">
+              <h4 className="mb-0">Flight Calendar</h4>
+              <div
+                className="h-fit cursor-pointer rounded-md bg-sandstone-40 px-[4px] hover:bg-light-primary hover:text-white"
                 onClick={() => {
-                  const flight = flights.find((e) => e._id == item.id);
-                  if (flight) {
-                    dispatch(selectFlight(flight));
-                    setFlightDetailsOpen(true);
-                  }
+                  hideFullCalendar();
                 }}
               >
-                <List.Item.Meta
-                  avatar={
-                    <Avatar
-                      style={{
-                        backgroundColor: item.flightReady
-                          ? "#CCE0AC"
-                          : "#FF8A8A",
+                <ShrinkOutlined />
+              </div>
+            </Flex>
+            <Divider />
+            <Calendar
+              fullscreen={true}
+              value={selectedDate}
+              onSelect={onDateSelect}
+              onPanelChange={onPanelChange}
+              cellRender={cellRender}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card className="card" style={{ backgroundColor: "#ebe5df" }}>
+            <h4>Flight List</h4>
+            <Divider />
+            <List>
+              {visibleFlights.length > 0 ? (
+                <VirtualList
+                  data={visibleFlights.map((flight) => ({
+                    id: flight._id!,
+                    key: flight._id!,
+                    name: `${flight.flightNumber}`,
+                    flightReady: isFlightReady(flight),
+                    departureTime: dayjs(flight.departure).format("HH:mm"),
+                    departureDate: dayjs(flight.departure).format("DD/MM/YYYY"),
+                    icon: <BiSolidPlane />,
+                  }))}
+                  itemHeight={47}
+                  itemKey="id"
+                >
+                  {(item: any) => (
+                    <List.Item
+                      key={item.name}
+                      className={`flight-calendar-list-item cursor-pointer rounded-md hover:bg-light-primary ${item.id == selectedFlight?._id ? "selected" : ""}`}
+                      onClick={() => {
+                        const flight = flights.find((e) => e._id == item.id);
+                        if (flight) {
+                          dispatch(selectFlight(flight));
+                          setFlightDetailsOpen(true);
+                        }
                       }}
-                      icon={item.icon}
-                    />
-                  }
-                  title={item.name}
-                  description={item.departureTime}
+                    >
+                      <List.Item.Meta
+                        avatar={
+                          <Avatar
+                            style={{
+                              backgroundColor: item.flightReady
+                                ? "#CCE0AC"
+                                : "#FF8A8A",
+                            }}
+                            icon={item.icon}
+                          />
+                        }
+                        title={item.name}
+                        description={`${item.departureDate} - ${item.departureTime}`}
+                      />
+                    </List.Item>
+                  )}
+                </VirtualList>
+              ) : (
+                <Empty
+                  description="No flights"
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
                 />
-              </List.Item>
-            )}
-          </VirtualList>
-        ) : (
-          <Empty
-            description="No flights"
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-          />
-        )}
-      </List>
+              )}
+            </List>
+          </Card>
+        </Col>
+      </Row>
       <AdminFlightDetailsDrawer
         visible={flightDetailsOpen}
         onClose={() => {

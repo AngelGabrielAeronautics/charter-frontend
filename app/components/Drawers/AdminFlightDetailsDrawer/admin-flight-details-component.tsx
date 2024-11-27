@@ -229,7 +229,7 @@ const AdminFlightDetailsComponent = () => {
         style={{ margin: "30px 6px 10px 6px" }}>
         <p className="font-bold">Operator</p>
         <p className="inline-block cursor-pointer font-bold hover:text-dark-tableHeaderBackground">
-          <EyeOutlined /> View Details
+          {/* <EyeOutlined /> View Details */}
         </p>
       </Flex>
       <Card
@@ -403,7 +403,7 @@ const AdminFlightDetailsComponent = () => {
         style={{ margin: "30px 6px 10px 6px" }}>
         <p className="font-bold">Aircraft</p>
         <p className="inline-block cursor-pointer font-bold hover:text-dark-tableHeaderBackground">
-          <EyeOutlined /> View Details
+          {/* <EyeOutlined /> View Details */}
         </p>
       </Flex>
       <Card

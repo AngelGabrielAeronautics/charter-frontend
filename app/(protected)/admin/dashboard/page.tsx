@@ -48,6 +48,7 @@ import { fetchFlights } from "@/lib/state/flights/flights.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 
 import FlightCalendar from "./flight-calendar";
+import FullCalendar from "./full-calendar";
 
 const notificationContainerHeight = 523;
 
@@ -74,6 +75,7 @@ const AdminDashboard = () => {
   const [open, setOpen] = useState(false);
   const [openAsset, setOpenAsset] = useState(false);
   const [openTask, setOpenTask] = useState(false);
+  const [showFullCalendar, setShowFullCalendar] = useState(false);
 
   const { authenticatedUser } = useAppSelector((state) => state.auth);
   const { stats, loading } = useAppSelector((state) => state.dashboard);
@@ -91,7 +93,7 @@ const AdminDashboard = () => {
 
   return (
     <div>
-      <div className="dashboard-view">
+      {!showFullCalendar && <div className="dashboard-view">
         <Spin
           size="large"
           tip={
@@ -141,7 +143,7 @@ const AdminDashboard = () => {
                     </Col>
                     <Link href="/admin/assets">
                       <Avatar
-                        style={{ backgroundColor: "#B1A7F2" }}
+                        style={{ marginLeft: 50, backgroundColor: "#B1A7F2" }}
                         shape="square"
                         size={44}
                         icon={<MdAirplanemodeActive />}
@@ -266,7 +268,7 @@ const AdminDashboard = () => {
           <Row style={{ marginTop: 30 }} gutter={10}>
             <Col span={8}>
               <Card className="card" style={{ backgroundColor: "#ebe5df" }}>
-                <FlightCalendar />
+                <FlightCalendar showFullCalendar={() => setShowFullCalendar(true)} />
               </Card>
             </Col>
             <Col span={8}>
@@ -329,8 +331,8 @@ const AdminDashboard = () => {
             </Col>
           </Row>
         </Spin>
-      </div>
-      <div className="calendar-full-view"></div>
+      </div>}
+      {showFullCalendar && <FullCalendar hideFullCalendar={() => setShowFullCalendar(false)} />}
       <FloatButton.Group
         type="primary"
         shape="square"
