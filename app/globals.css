@@ -218,3 +218,18 @@ a .anticon,
 .ant-radio-button-wrapper {
   background-color: #f7f2ec !important;
 }
+
+li.flight-calendar-list-item {
+  padding-left: 1rem !important;
+}
+
+li.flight-calendar-list-item.selected {
+  background-color: #08415c;
+}
+
+li.flight-calendar-list-item.selected h4.ant-list-item-meta-title,
+li.flight-calendar-list-item:hover h4.ant-list-item-meta-title,
+li.flight-calendar-list-item.selected div.ant-list-item-meta-description,
+li.flight-calendar-list-item:hover div.ant-list-item-meta-description {
+  color: #f1f1f1 !important;
+}
