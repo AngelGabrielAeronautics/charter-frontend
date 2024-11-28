@@ -653,8 +653,7 @@ const FlightDetailsComponent = () => {
                   <Text style={{ fontSize: 14, marginTop: 10 }} strong>
                     Air Operating Certificate
                   </Text>
-                  {selectedFlight?.operator?.certifications
-                    .airOperatingCertificate && (
+                  {selectedFlight?.operator?.certifications?.airOperatingCertificate && (
                     <Link
                       style={{ color: "#0c3747" }}
                       target="_blank"
@@ -687,8 +686,7 @@ const FlightDetailsComponent = () => {
                   <Text style={{ fontSize: 14 }} strong>
                     Certificate of Insurance
                   </Text>
-                  {selectedFlight?.operator?.certifications
-                    .certificateOfInsurance && (
+                  {selectedFlight?.operator?.certifications?.certificateOfInsurance && (
                     <Link
                       style={{ color: "#0c3747" }}
                       target="_blank"
@@ -720,8 +718,7 @@ const FlightDetailsComponent = () => {
                   <Text style={{ fontSize: 14 }} strong>
                     Certificate of Air Worthiness
                   </Text>
-                  {selectedFlight?.operator?.certifications
-                    .certificateOfAirworthiness && (
+                  {selectedFlight?.operator?.certifications?.certificateOfAirworthiness && (
                     <Link
                       style={{ color: "#0c3747" }}
                       target="_blank"
