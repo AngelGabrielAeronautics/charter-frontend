@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   ContainerOutlined,
@@ -10,9 +10,6 @@ import {
 } from "@ant-design/icons";
 import {
   Avatar,
-  Button,
-  Calendar,
-  CalendarProps,
   Card,
   Col,
   Empty,
@@ -22,14 +19,10 @@ import {
   Row,
   Spin,
   Tooltip,
-  theme,
 } from "antd";
-import type { Dayjs } from "dayjs";
-import dayjs from "dayjs";
 import VirtualList from "rc-virtual-list";
 import { GiAirplaneDeparture } from "react-icons/gi";
 import { GoCopilot } from "react-icons/go";
-import { GrTask } from "react-icons/gr";
 import { HiOutlineCash } from "react-icons/hi";
 import {
   MdAirplanemodeActive,
@@ -42,7 +35,6 @@ import CreateAssetsDrawer from "@/app/components/Drawers/CreateAssetDrawer";
 import CreateFlightDrawer from "@/app/components/Drawers/CreateFlightDrawer";
 import TaskDrawer from "@/app/components/Drawers/TaskDrawer";
 
-import { IFlight } from "@/lib/models/flight.model";
 import { getAdminDashboard } from "@/lib/state/dashboard/slice";
 import { fetchFlights } from "@/lib/state/flights/flights.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
