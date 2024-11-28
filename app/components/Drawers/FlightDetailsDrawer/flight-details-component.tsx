@@ -659,10 +659,9 @@ const FlightDetailsComponent = () => {
                       style={{ color: "#0c3747" }}
                       target="_blank"
                       rel="noopener noreferrer"
-                      href={`data:application/pdf;base64,${selectedFlight?.operator?.certifications.airOperatingCertificate.data}`}
+                      href={`data:application/pdf;base64,${selectedFlight?.operator?.certifications?.airOperatingCertificate?.file?.data}`}
                       download={
-                        selectedFlight?.operator?.certifications
-                          .airOperatingCertificate.name
+                        selectedFlight?.operator?.certifications?.airOperatingCertificate?.file?.name
                       }
                     >
                       <IoMdDownload
@@ -694,10 +693,9 @@ const FlightDetailsComponent = () => {
                       style={{ color: "#0c3747" }}
                       target="_blank"
                       rel="noopener noreferrer"
-                      href={`data:application/pdf;base64,${selectedFlight?.operator?.certifications.certificateOfInsurance.data}`}
+                      href={`data:application/pdf;base64,${selectedFlight?.operator?.certifications?.certificateOfInsurance?.file?.data}`}
                       download={
-                        selectedFlight?.operator?.certifications
-                          .certificateOfInsurance.name
+                        selectedFlight?.operator?.certifications?.certificateOfInsurance?.file?.name
                       }
                     >
                       <IoMdDownload
@@ -728,10 +726,9 @@ const FlightDetailsComponent = () => {
                       style={{ color: "#0c3747" }}
                       target="_blank"
                       rel="noopener noreferrer"
-                      href={`data:application/pdf;base64,${selectedFlight?.operator?.certifications.certificateOfAirworthiness.data}`}
+                      href={`data:application/pdf;base64,${selectedFlight?.operator?.certifications?.certificateOfAirworthiness?.file?.data}`}
                       download={
-                        selectedFlight?.operator?.certifications
-                          .certificateOfAirworthiness.name
+                        selectedFlight?.operator?.certifications?.certificateOfAirworthiness?.file?.name
                       }
                     >
                       <IoMdDownload
