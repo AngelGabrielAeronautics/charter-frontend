@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { DownloadOutlined, UploadOutlined } from "@ant-design/icons";
 import { Space, Table, Tag } from "antd";
 
-import { IFileInfo } from "@/lib/models/file.model";
 import { useAppSelector } from "@/lib/state/hooks";
 
 import UploadFileInfoDrawer from "../Drawers/FileDrawer";
@@ -14,7 +13,7 @@ const CertificationsSection = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<string>();
   const [selectedKey, setSelectedKey] = useState<string>();
-  const [certifications, setCertifications] = useState<IFileInfo[]>([]);
+  const [certifications, setCertifications] = useState<any[]>([]); // Updated to support table rows
 
   const { currentOperator } = useAppSelector((state) => state.operators);
 
@@ -28,17 +27,29 @@ const CertificationsSection = () => {
       title: "Date Uploaded",
       dataIndex: "dateUploaded",
       key: "dateUploaded",
+      render: (value: string | null) =>
+        value ? new Date(value).toLocaleDateString() : "N/A",
     },
     {
       title: "Document Expiration Date",
       dataIndex: "expirationDate",
       key: "expirationDate",
+      render: (value: string | null) =>
+        value ? new Date(value).toLocaleDateString() : "N/A",
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (value: string) => <Tag>{value}</Tag>,
+      render: (value: string) => (
+        <Tag
+          color={
+            value === "Not Uploaded" || value === "Expired" ? "red" : "green"
+          }
+        >
+          {value}
+        </Tag>
+      ),
     },
     {
       title: "Actions",
@@ -46,22 +57,24 @@ const CertificationsSection = () => {
       render: (_: any, record: any) => (
         <Space size="middle">
           <UploadOutlined
-            style={{ fontSize: "16px" }}
+            style={{ fontSize: "16px", cursor: "pointer" }}
             onClick={() => {
               setSelectedDocument(record.documentName);
               if (record.documentName === "Air Operating Certificate")
-                setSelectedKey("certifications.airOperatingCertificate");
+                setSelectedKey("airOperatingCertificate");
               if (record.documentName === "Certificate of Insurance")
-                setSelectedKey("certifications.certificateOfInsurance");
-              if (record.documentName === "Certificate of Air Worthiness")
-                setSelectedKey("certifications.certificateOfAirworthiness");
+                setSelectedKey("certificateOfInsurance");
+              if (record.documentName === "Certificate of Airworthiness")
+                setSelectedKey("certificateOfAirworthiness");
               setDrawerOpen(true);
             }}
           />
-          <DownloadOutlined
-            onClick={() => handleDownload(record._id)}
-            style={{ fontSize: "16px" }}
-          />
+          {record.data && (
+            <DownloadOutlined
+              onClick={() => handleDownload(record)}
+              style={{ fontSize: "16px", cursor: "pointer" }}
+            />
+          )}
         </Space>
       ),
     },
@@ -75,47 +88,103 @@ const CertificationsSection = () => {
       const COFI = currentOperator.certifications?.certificateOfInsurance;
       const COFA = currentOperator.certifications?.certificateOfAirworthiness;
 
-      if (AOC) {
-        _certifications.push(AOC);
-      } else {
-        _certifications.push({
-          documentName: "Air Operating Certificate",
-          status: "Not Uploaded",
-          expirationDate: null,
-          dateUploaded: null,
-        });
-      }
-      if (COFI) {
-        _certifications.push(COFI);
-      } else {
-        _certifications.push({
-          documentName: "Certificate of Insurance",
-          status: "Not Uploaded",
-          expirationDate: null,
-          dateUploaded: null,
-        });
-      }
-      if (COFA) {
-        _certifications.push(COFA);
-      } else {
-        _certifications.push({
-          documentName: "Certificate of Airworthiness",
-          status: "Not Uploaded",
-          expirationDate: null,
-          dateUploaded: null,
-        });
-      }
+      // Add Air Operating Certificate
+      _certifications.push(
+        AOC
+          ? {
+              documentName: "Air Operating Certificate",
+              dateUploaded: AOC.dateUploaded || null,
+              expirationDate: AOC.expirationDate || null,
+              status: AOC.expirationDate
+                ? new Date(AOC.expirationDate) > new Date()
+                  ? "Valid"
+                  : "Expired"
+                : "Valid",
+              data: AOC,
+            }
+          : {
+              documentName: "Air Operating Certificate",
+              status: "Not Uploaded",
+              expirationDate: null,
+              dateUploaded: null,
+              data: null,
+            }
+      );
 
-      // setCertifications(_certifications)
+      // Add Certificate of Insurance
+      _certifications.push(
+        COFI
+          ? {
+              documentName: "Certificate of Insurance",
+              dateUploaded: COFI.dateUploaded || null,
+              expirationDate: COFI.expirationDate || null,
+              status: COFI.expirationDate
+                ? new Date(COFI.expirationDate) > new Date()
+                  ? "Valid"
+                  : "Expired"
+                : "Valid",
+              data: COFI,
+            }
+          : {
+              documentName: "Certificate of Insurance",
+              status: "Not Uploaded",
+              expirationDate: null,
+              dateUploaded: null,
+              data: null,
+            }
+      );
+
+      // Add Certificate of Airworthiness
+      _certifications.push(
+        COFA
+          ? {
+              documentName: "Certificate of Airworthiness",
+              dateUploaded: COFA.dateUploaded || null,
+              expirationDate: COFA.expirationDate || null,
+              status: COFA.expirationDate
+                ? new Date(COFA.expirationDate) > new Date()
+                  ? "Valid"
+                  : "Expired"
+                : "Valid",
+              data: COFA,
+            }
+          : {
+              documentName: "Certificate of Airworthiness",
+              status: "Not Uploaded",
+              expirationDate: null,
+              dateUploaded: null,
+              data: null,
+            }
+      );
+
+      setCertifications(_certifications); // Set certifications for the table
     }
-    return () => {};
   }, [currentOperator]);
 
-  const handleDownload = (id: string) => {};
+  const handleDownload = (record: any) => {
+    if (!record.data?.file?.data) {
+      console.error("No file data available");
+      return;
+    }
+
+    const file = record.data.file;
+
+    const link = document.createElement("a");
+    link.href = `data:${file.mimetype};base64,${file.data}`;
+    link.download = file.name || "document.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <section className="certifications-section">
-      <Table dataSource={certifications} columns={columns} pagination={false} />
+      <Table
+        dataSource={certifications}
+        columns={columns}
+        rowKey="documentName"
+        pagination={false}
+      />
       {selectedDocument && selectedKey && (
         <UploadFileInfoDrawer
           modelKey={selectedKey}

@@ -1,23 +1,20 @@
 import React, { useState } from "react";
 
+
+
 import { UploadOutlined } from "@ant-design/icons";
-import {
-  Button,
-  DatePicker,
-  Drawer,
-  Form,
-  Input,
-  Select,
-  Space,
-  Upload,
-  message,
-} from "antd";
+import { Button, DatePicker, Drawer, Form, Input, Select, Space, Upload, message } from "antd";
 import type { GetProp, UploadFile, UploadProps } from "antd";
+
+
 
 import { API_BASE_URL } from "@/app/(config)/constants";
 
+
+
 import { eModules } from "@/lib/enums/modules.enums";
 import { useAppSelector } from "@/lib/state/hooks";
+
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -53,7 +50,7 @@ const UploadFileInfoDrawer: React.FC<CreateTaskProps> = ({
     setUploading(true);
 
     fetch(
-      `${API_BASE_URL}/${eModules.OperatorsModule}/upload/${modelKey}/${authenticatedUser?.operatorId}`,
+      `${API_BASE_URL}/${eModules.OperatorsModule}/upload/certificate/${modelKey}/${authenticatedUser?.operatorId}`,
       {
         method: "POST",
         body: formData,

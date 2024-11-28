@@ -146,6 +146,7 @@ export const cancelFlight = createAsyncThunk(
 export const updateFlightThunk = createAsyncThunk(
   "flights/update",
   async (payload: any) => {
+    console.log("updateFlightThunk", payload)
     const response = await fetch(`${API_BASE_URL}/flights/${payload.id}`, {
       method: "PATCH",
       headers: {
@@ -460,8 +461,9 @@ export const FlightsSlice = createSlice({
         shouldNotify: true,
         type: "success",
         title: "",
-        message: `Successfully update flight`,
+        message: `Successfully updated flight`,
       };
+      state.selectedFlight = updatedFlight;
       state.flights = state.flights.map((flight) =>
         flight._id === updatedFlight._id
           ? { ...flight, ...updatedFlight }

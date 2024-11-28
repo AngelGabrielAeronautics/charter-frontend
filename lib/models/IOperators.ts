@@ -30,9 +30,9 @@ export interface IOperator {
 }
 
 export interface ICertifications {
-  airOperatingCertificate: IFile;
-  certificateOfInsurance: IFile;
-  certificateOfAirworthiness: IFile;
+  airOperatingCertificate: IFileInfo;
+  certificateOfInsurance: IFileInfo;
+  certificateOfAirworthiness: IFileInfo;
 }
 
 export interface IContactPerson extends IPerson {

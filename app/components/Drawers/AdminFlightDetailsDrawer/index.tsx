@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
+
+
 
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { Drawer, Space, Tag } from "antd";
 
+
+
 import { useAppSelector } from "@/lib/state/hooks";
 
+
+
 import AdminFlightDetailsComponent from "./admin-flight-details-component";
+import FlightChecklist from "@/app/(protected)/admin/flights/flight-checklist";
+
 
 interface FlightDetailProps {
   visible: boolean;
@@ -17,6 +25,7 @@ const AdminFlightDetailsDrawer: React.FC<FlightDetailProps> = ({
   onClose,
 }) => {
   const { selectedFlight } = useAppSelector((state) => state.flights);
+  const [checklistVisible, setChecklistVisible] = useState(false);
 
   const isFlightReady = () => {
     if (!selectedFlight) return false;
@@ -55,7 +64,7 @@ const AdminFlightDetailsDrawer: React.FC<FlightDetailProps> = ({
       onClose={() => onClose()}
       open={visible}
       extra={[
-        <Space>
+        <Space onClick={() => setChecklistVisible(true)}>
           <InfoCircleOutlined size={8} />
           <small className="font-semibold">Status: </small>
           <Tag color={isFlightReady() ? "success" : "error"}>
@@ -66,6 +75,21 @@ const AdminFlightDetailsDrawer: React.FC<FlightDetailProps> = ({
       style={{ backgroundColor: "#f7f2ed" }}
     >
       <AdminFlightDetailsComponent />
+      {/* Inner Drawer for Checklist */}
+      <Drawer
+        id="flight-checklist-drawer"
+        title="Flight Checklist"
+        width={480}
+        onClose={() => setChecklistVisible(false)} // Close checklist drawer
+        open={checklistVisible}
+        destroyOnClose
+      >
+        {selectedFlight?.checklist ? (
+          <FlightChecklist checklist={selectedFlight.checklist} />
+        ) : (
+          <p>No checklist available for this flight.</p>
+        )}
+      </Drawer>
     </Drawer>
   );
 };
