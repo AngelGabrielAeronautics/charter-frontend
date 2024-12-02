@@ -4,22 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+
+
 import { UserOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Card,
-  Col,
-  Divider,
-  Empty,
-  Flex,
-  Modal,
-  Result,
-  Row,
-  Skeleton,
-  Spin,
-} from "antd";
+import { Button, Card, Col, Divider, Empty, Flex, Modal, Result, Row, Skeleton, Spin } from "antd";
 import { IoAirplane } from "react-icons/io5";
 import short from "short-uuid";
+
+
 
 import { eRoutes } from "@/app/(config)/routes";
 import { PageHeader, SearchBox } from "@/app/components";
@@ -28,28 +20,19 @@ import FlightDetailsDrawer from "@/app/components/Drawers/FlightDetailsDrawer";
 import { OperatorBanner } from "@/app/components/Flights/OperatorBanner";
 import FlightSearch from "@/app/components/SearchBox/FlightSearch";
 
-import {
-  formatToMoneyWithCurrency,
-  formatUCTtoISO,
-} from "@/lib/helpers/formatters.helpers";
+
+
+import { formatToMoneyWithCurrency, formatUCTtoISO } from "@/lib/helpers/formatters.helpers";
 import { IQuotationRequest } from "@/lib/models/IQuotationRequest";
 import { IUser } from "@/lib/models/IUser";
 import { IAirport } from "@/lib/models/airport.model";
 import { IAntCardStyle } from "@/lib/models/ant-card-style.interface";
 import { IFlight } from "@/lib/models/flight.model";
-import {
-  clearFlightSelection,
-  fetchFlights,
-  filterFlights,
-  resetFlightCriteria,
-  selectFlight,
-} from "@/lib/state/flights/flights.slice";
+import { clearFlightSelection, fetchFlights, filterFlights, resetFlightCriteria, selectFlight } from "@/lib/state/flights/flights.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 import { fetchOperators } from "@/lib/state/operators/operators.slice";
-import {
-  create,
-  resetActionStates,
-} from "@/lib/state/quotationRequests/quotationRequests.slice";
+import { create, resetActionStates } from "@/lib/state/quotationRequests/quotationRequests.slice";
+
 
 const AgencyFlights = () => {
   const dispatch = useAppDispatch();
@@ -82,7 +65,12 @@ const AgencyFlights = () => {
     dispatch(fetchOperators());
 
     if (!shouldShowSearchResults) {
-      dispatch(filterFlights({ departure: { $gte: new Date() } }));
+      dispatch(
+        filterFlights({
+          departure: { $gte: new Date() },
+          maxSeatsAvailable: { $gt: 0 },
+        })
+      );
     }
 
     return () => {};
@@ -96,7 +84,12 @@ const AgencyFlights = () => {
 
   const clearSearch = () => {
     dispatch(resetFlightCriteria());
-    dispatch(filterFlights({ departure: { $gte: new Date() } }));
+    dispatch(
+      filterFlights({
+        departure: { $gte: new Date() },
+        maxSeatsAvailable: { $gt: 0 },
+      })
+    );
   };
 
   const submitQuotationRequest = () => {

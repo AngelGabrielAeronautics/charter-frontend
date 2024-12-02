@@ -65,7 +65,7 @@ const Flights = () => {
     // if (flights.length > 0 && !searchingFlights) dispatch(fetchOperators());
 
     if (!shouldShowSearchResults && !searchingFlights) {
-      dispatch(filterFlights({ departure: { $gte: new Date() } }));
+      dispatch(filterFlights({ departure: { $gte: new Date() }, maxSeatsAvailable: { $gt: 0 } }));
     }
 
     return () => {};
@@ -79,7 +79,7 @@ const Flights = () => {
 
   const clearSearch = () => {
     dispatch(resetFlightCriteria());
-    dispatch(filterFlights({ departure: { $gte: new Date() } }));
+    dispatch(filterFlights({ departure: { $gte: new Date() }, maxSeatsAvailable: { $gt: 0 } }));
   };
 
   const submitQuotationRequest = () => {

@@ -453,39 +453,48 @@ const FlightDetailsComponent = () => {
           </Col>
           <Row style={{ width: "100%" }}>
             <Col span={24} className="flex p-4">
-              <Flex justify="space-between">
-                <span
-                  className="centre-content"
-                  style={{ fontSize: 18, fontWeight: "bold", color: "#49666f" }}
-                >
-                  Book dead leg flight
-                </span>
-                <div className="flex flex-col items-end">
-                  <span
-                    style={{
-                      color: "#736764",
-                      fontSize: 16,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Total: {formatToMoneyWithCurrency(totalFlightPrice)}
-                  </span>
-                  <Button
-                    style={{
-                      height: "1rem",
-                      width: "5.5rem",
-                      backgroundColor: "#736764",
-                      marginTop: 10,
-                      fontSize: 12,
-                    }}
-                    type="primary"
-                    onClick={purchaseAllTickets}
-                  >
-                    BUY
-                  </Button>
-                </div>
-              </Flex>
-              <Divider style={{ margin: "1rem 0" }} />
+              {selectedFlight?.capacity ==
+                selectedFlight?.maxSeatsAvailable && (
+                <>
+                  <Flex justify="space-between">
+                    <span
+                      className="centre-content"
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "bold",
+                        color: "#49666f",
+                      }}
+                    >
+                      Book dead leg flight
+                    </span>
+                    <div className="flex flex-col items-end">
+                      <span
+                        style={{
+                          color: "#736764",
+                          fontSize: 16,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Total: {formatToMoneyWithCurrency(totalFlightPrice)}
+                      </span>
+                      <Button
+                        style={{
+                          height: "1rem",
+                          width: "5.5rem",
+                          backgroundColor: "#736764",
+                          marginTop: 10,
+                          fontSize: 12,
+                        }}
+                        type="primary"
+                        onClick={purchaseAllTickets}
+                      >
+                        BUY
+                      </Button>
+                    </div>
+                  </Flex>
+                  <Divider style={{ margin: "1rem 0" }} />
+                </>
+              )}
               <Flex justify="space-between">
                 <span
                   className="centre-content"
@@ -653,14 +662,16 @@ const FlightDetailsComponent = () => {
                   <Text style={{ fontSize: 14, marginTop: 10 }} strong>
                     Air Operating Certificate
                   </Text>
-                  {selectedFlight?.operator?.certifications?.airOperatingCertificate && (
+                  {selectedFlight?.operator?.certifications
+                    ?.airOperatingCertificate && (
                     <Link
                       style={{ color: "#0c3747" }}
                       target="_blank"
                       rel="noopener noreferrer"
                       href={`data:application/pdf;base64,${selectedFlight?.operator?.certifications?.airOperatingCertificate?.file?.data}`}
                       download={
-                        selectedFlight?.operator?.certifications?.airOperatingCertificate?.file?.name
+                        selectedFlight?.operator?.certifications
+                          ?.airOperatingCertificate?.file?.name
                       }
                     >
                       <IoMdDownload
@@ -686,14 +697,16 @@ const FlightDetailsComponent = () => {
                   <Text style={{ fontSize: 14 }} strong>
                     Certificate of Insurance
                   </Text>
-                  {selectedFlight?.operator?.certifications?.certificateOfInsurance && (
+                  {selectedFlight?.operator?.certifications
+                    ?.certificateOfInsurance && (
                     <Link
                       style={{ color: "#0c3747" }}
                       target="_blank"
                       rel="noopener noreferrer"
                       href={`data:application/pdf;base64,${selectedFlight?.operator?.certifications?.certificateOfInsurance?.file?.data}`}
                       download={
-                        selectedFlight?.operator?.certifications?.certificateOfInsurance?.file?.name
+                        selectedFlight?.operator?.certifications
+                          ?.certificateOfInsurance?.file?.name
                       }
                     >
                       <IoMdDownload
@@ -718,14 +731,16 @@ const FlightDetailsComponent = () => {
                   <Text style={{ fontSize: 14 }} strong>
                     Certificate of Air Worthiness
                   </Text>
-                  {selectedFlight?.operator?.certifications?.certificateOfAirworthiness && (
+                  {selectedFlight?.operator?.certifications
+                    ?.certificateOfAirworthiness && (
                     <Link
                       style={{ color: "#0c3747" }}
                       target="_blank"
                       rel="noopener noreferrer"
                       href={`data:application/pdf;base64,${selectedFlight?.operator?.certifications?.certificateOfAirworthiness?.file?.data}`}
                       download={
-                        selectedFlight?.operator?.certifications?.certificateOfAirworthiness?.file?.name
+                        selectedFlight?.operator?.certifications
+                          ?.certificateOfAirworthiness?.file?.name
                       }
                     >
                       <IoMdDownload

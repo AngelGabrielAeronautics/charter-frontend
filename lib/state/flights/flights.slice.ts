@@ -91,6 +91,7 @@ export const searchFlights = createAsyncThunk(
           {
             ...criterion,
             departureDate: departureDateTimeISO,
+            maxSeatsAvailable: { $gt: 0 }
           },
         ]),
       });
