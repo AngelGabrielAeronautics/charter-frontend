@@ -1,25 +1,68 @@
 import Image from "next/image";
 import { CSSProperties, useEffect, useState } from "react";
 
-
-
-import { CheckCircleOutlined, EnvironmentOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { Button, Card, Cascader, Col, DatePicker, Descriptions, Divider, Drawer, Flex, Form, Input, InputNumber, List, Modal, Rate, Row, Select, Space, Switch, Tag, TimePicker, Typography, notification } from "antd";
+import {
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  EnvironmentOutlined,
+  EyeOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
+import {
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Descriptions,
+  Divider,
+  Drawer,
+  Flex,
+  Form,
+  Input,
+  InputNumber,
+  List,
+  Modal,
+  Rate,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Tag,
+  TimePicker,
+  Typography,
+  notification,
+} from "antd";
 import dayjs from "dayjs";
 import { IoMdDownload } from "react-icons/io";
+import { IoAirplane } from "react-icons/io5";
+import { LiaPlaneDepartureSolid } from "react-icons/lia";
 import short from "short-uuid";
 
-
-
-import { formatToMoneyWithCurrency, formatUCTtoISO, getTimeFromDate } from "@/lib/helpers/formatters.helpers";
+import {
+  formatToMoneyWithCurrency,
+  formatUCTtoISO,
+  getTimeFromDate,
+} from "@/lib/helpers/formatters.helpers";
 import { IAsset } from "@/lib/models/IAssets";
 import { IOperator } from "@/lib/models/IOperators";
-import { IQuotationRequestUpdateDTO } from "@/lib/models/IQuotationRequest";
-import { IQuotation, IQuotationUpdateDTO } from "@/lib/models/IQuotations";
+import {
+  IQuotationRequestUpdateDTO,
+  ITripLeg,
+} from "@/lib/models/IQuotationRequest";
+import { IQuotation } from "@/lib/models/IQuotations";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
-import { deselectRecord, updateQuotationRequest } from "@/lib/state/quotationRequests/quotationRequests.slice";
-import { accept, create, filter, findByRequest, reject, resetActionStates, setSelectedQuotation, update } from "@/lib/state/quotations/quotations.slice";
-
+import {
+  deselectRecord,
+  updateQuotationRequest,
+} from "@/lib/state/quotationRequests/quotationRequests.slice";
+import {
+  accept,
+  create,
+  findByRequest,
+  reject,
+  resetActionStates,
+  setSelectedQuotation,
+} from "@/lib/state/quotations/quotations.slice";
 
 const inputStyle: CSSProperties = { width: "100%" };
 
@@ -32,6 +75,7 @@ const QuotationRequestDrawer = ({
 }) => {
   const [form] = Form.useForm();
 
+  const [tripDetailsOpen, setTripDetailsOpen] = useState(false);
   const [operatorDetailsVisible, setOperatorDetailsVisible] = useState(false);
   const [operatorDetails, setOperatorDetails] = useState<IOperator>();
   const [quotationFormVisible, setQuotationFormVisible] = useState(false);
@@ -147,7 +191,7 @@ const QuotationRequestDrawer = ({
       width={800}
       onClose={() => {
         setOpen(false);
-        dispatch(deselectRecord())
+        dispatch(deselectRecord());
       }}
       open={open}
       extra={
@@ -188,51 +232,45 @@ const QuotationRequestDrawer = ({
             children: <>{selectedQuotationRequest?.quotationRequestNumber}</>,
           },
           {
-            key: "Number of Seats",
-            label: "Number of Seats",
+            key: "Number of Passengers",
+            label: "Number of Passengers",
             span: 1,
-            children: <>{selectedQuotationRequest?.numberOfPassengers}</>,
+            children: <>{selectedQuotationRequest?.numberOfPassengers.total}</>,
           },
           {
-            key: "Departure Airport",
-            label: "Departure Airport",
+            key: "Pets Allowed",
+            label: "Pets Allowed",
             span: 2,
             children: (
-              <>{selectedQuotationRequest?.departureAirport?.shortLabel}</>
+              <>{selectedQuotationRequest?.petsAllowed ? "YES" : "NO"}</>
             ),
           },
           {
-            key: "Departure Date",
-            label: "Departure Date",
+            key: "Smoking Allowed",
+            label: "Smoking Allowed",
             span: 1,
             children: (
-              <>
-                {selectedQuotationRequest?.dateOfDeparture &&
-                  formatUCTtoISO(
-                    selectedQuotationRequest?.dateOfDeparture.toString()
-                  )}{" "}
-                {selectedQuotationRequest?.dateOfDeparture &&
-                  selectedQuotationRequest?.timeOfDeparture}
-              </>
+              <>{selectedQuotationRequest?.smokingAllowed ? "YES" : "NO"}</>
             ),
           },
           {
-            key: "Arrival Airport",
+            key: "Trip",
+            label: "Trip Legs",
             span: 2,
-            label: "Arrival Airport",
             children: (
-              <>{selectedQuotationRequest?.arrivalAirport?.shortLabel}</>
+              <Tag
+                color="blue"
+                className="cursor-pointer"
+                onClick={() => setTripDetailsOpen(true)}
+              >
+                <EyeOutlined /> {selectedQuotationRequest?.trip.length} Legs
+              </Tag>
             ),
-          },
-          {
-            key: "Arrival Date",
-            label: "Arrival Date",
-            span: 1,
-            children: "TBD",
           },
           {
             key: "Status",
             label: "Status",
+            span: 1,
             children: (
               <Tag
                 color={
@@ -385,6 +423,54 @@ const QuotationRequestDrawer = ({
           );
         }}
       />
+      <Drawer
+        title="Trip Details"
+        width={600}
+        closable={true}
+        onClose={() => {
+          setTripDetailsOpen(false);
+        }}
+        open={tripDetailsOpen}
+      >
+        <List
+          grid={{
+            gutter: 16,
+            column: 1,
+          }}
+          className="quotations-list"
+          itemLayout="horizontal"
+          dataSource={selectedQuotationRequest?.trip}
+          renderItem={(item: ITripLeg, index) => {
+            return (
+              <List.Item>
+                <Card>
+                  <Flex justify="space-between">
+                    <div>
+                      <h5 className="mb-1">
+                        {item.departureAirport?.shortLabel}
+                      </h5>
+                      <Flex align="center" gap={4}>
+                        <LiaPlaneDepartureSolid />
+                        <p>
+                          {dayjs(item.dateOfDeparture).format("DD MMM YYYY")}
+                        </p>
+                      </Flex>
+                      <Flex align="center" gap={4}>
+                        <ClockCircleOutlined />
+                        <p>{item.timeOfDeparture}</p>
+                      </Flex>
+                    </div>
+                    <IoAirplane size={16} color="#0B3746" className="mt-1" />{" "}
+                    <div className="text-end">
+                      <h5>{item.arrivalAirport?.shortLabel}</h5>
+                    </div>
+                  </Flex>
+                </Card>
+              </List.Item>
+            );
+          }}
+        />
+      </Drawer>
       <Drawer
         title="Operator Details"
         width={600}
@@ -561,10 +647,10 @@ const QuotationRequestDrawer = ({
               flightDetails: {
                 operatorId: authenticatedUser?.operatorId,
                 aircraftId: values.aircraftId,
-                departure: selectedQuotationRequest?.dateOfDeparture,
+                // departure: selectedQuotationRequest?.dateOfDeparture,
                 duration: values.flightDurationHours,
-                departureAirport: selectedQuotationRequest?.departureAirport,
-                arrivalAirport: selectedQuotationRequest?.arrivalAirport,
+                // departureAirport: selectedQuotationRequest?.departureAirport,
+                // arrivalAirport: selectedQuotationRequest?.arrivalAirport,
                 status: "Offered",
                 arrivalDate: values.arrivalDate,
                 arrivalMeetingArea: values.arrivalMeetingPlace,
@@ -730,10 +816,10 @@ const QuotationRequestDrawer = ({
               style={{ width: "100%" }}
             >
               <DatePicker
-                defaultValue={dayjs(selectedQuotationRequest?.dateOfDeparture)}
-                defaultPickerValue={dayjs(
-                  selectedQuotationRequest?.dateOfDeparture
-                )}
+                // defaultValue={dayjs(selectedQuotationRequest?.dateOfDeparture)}
+                // defaultPickerValue={dayjs(
+                //   selectedQuotationRequest?.dateOfDeparture
+                // )}
                 onChange={(date, dateString) => {}}
                 minDate={dayjs().add(1, "day")}
                 style={{ width: "100%" }}

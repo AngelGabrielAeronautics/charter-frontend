@@ -77,6 +77,13 @@ export const findAll = createAsyncThunk(
   }
 );
 
+export const findByCountry = createAsyncThunk(
+  `${subject}/findByCountry`,
+  async (payload: any, thunk) => {
+    return await service.findByCountry(payload);
+  }
+);
+
 export const filterQuotationRequests = createAsyncThunk(
   `${subject}/filter`,
   async (payload: any, thunk) => {
@@ -162,6 +169,20 @@ export const QuotationRequestSlice = createSlice({
       state.quotationRequests = action.payload.reverse();
     });
     builder.addCase(fetchQuotationRequests.rejected, (state, action) => {
+      state.isFetchingQuotationRequests = false;
+      state.loading.listRecords = false;
+      state.error.listRecords = action.error.message;
+    });
+    builder.addCase(findByCountry.pending, (state, action) => {
+      state.isFetchingQuotationRequests = true;
+      state.loading.listRecords = true;
+    });
+    builder.addCase(findByCountry.fulfilled, (state, action) => {
+      state.isFetchingQuotationRequests = false;
+      state.loading.listRecords = false;
+      state.quotationRequests = action.payload.reverse();
+    });
+    builder.addCase(findByCountry.rejected, (state, action) => {
       state.isFetchingQuotationRequests = false;
       state.loading.listRecords = false;
       state.error.listRecords = action.error.message;

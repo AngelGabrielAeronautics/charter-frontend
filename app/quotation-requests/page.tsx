@@ -4,13 +4,18 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Card, Col, Divider, Empty, Flex, Row, Space, Spin, Tag } from "antd";
-import { IoAirplane } from "react-icons/io5";
+import dayjs from "dayjs";
+import { LiaPlaneDepartureSolid } from "react-icons/lia";
+import {
+  MdAirlineSeatReclineNormal,
+  MdPets,
+  MdSmokingRooms,
+} from "react-icons/md";
 
 import ClientAppBar from "@/app/components/ClientAppBar";
 
 import { formatUCTtoISO } from "@/lib/helpers/formatters.helpers";
 import { IQuotationRequest } from "@/lib/models/IQuotationRequest";
-import { IQuotationUpdateDTO } from "@/lib/models/IQuotations";
 import { IAntCardStyle } from "@/lib/models/ant-card-style.interface";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 import {
@@ -46,7 +51,7 @@ const QuotationRequests = () => {
 
   useEffect(() => {
     if (authenticatedUser) {
-      const payload = { "customer._id": authenticatedUser._id };
+      const payload = { customerId: authenticatedUser._id };
       dispatch(filterQuotationRequests(payload));
     }
 
@@ -77,53 +82,73 @@ const QuotationRequests = () => {
                 ) => {
                   if (!record._id) return;
                   return (
-                  <Col span={6} key={record._id}>
-                    <Card
-                      key={record._id}
-                      onClick={() => {
-                        dispatch(selectRecord(record));
-                        dispatch(filter({ quotationRequestId: record._id }));
-                        setShowDrawer(true);
-                      }}
-                      hoverable
-                      styles={styles}
-                      style={{
-                        marginBottom: "1rem",
-                        backgroundColor: "#f9efe4",
-                      }}
-                    >
-                      {/* <OperatorBanner id={record.operatorId} operators={operators} flag={record.arrivalAirport.flag} /> */}
-                      <div style={{ padding: "0.5rem 1rem" }}>
-                        <Flex justify="space-between">
+                    <Col span={6} key={record._id}>
+                      <Card
+                        key={record._id}
+                        onClick={() => {
+                          dispatch(selectRecord(record));
+                          dispatch(filter({ quotationRequestId: record._id }));
+                          setShowDrawer(true);
+                        }}
+                        hoverable
+                        styles={styles}
+                        style={{
+                          marginBottom: "1rem",
+                          backgroundColor: "#f9efe4",
+                        }}
+                      >
+                        {/* <OperatorBanner id={record.operatorId} operators={operators} flag={record.arrivalAirport.flag} /> */}
+                        <div style={{ padding: "0.5rem 0.75rem" }}>
+                          <Flex justify="space-between">
+                            <strong>{record.quotationRequestNumber}</strong>
+                            {/* <IoAirplane />{" "} */}
+                            {/* <strong>{record.arrivalAirport.shortLabel}</strong> */}
+                            <Tag
+                              color={
+                                record.status == "Fulfilled"
+                                  ? "success"
+                                  : record.status == "Cancelled"
+                                    ? "error"
+                                    : record.status == "Quoted"
+                                      ? "blue"
+                                      : "warning"
+                              }
+                            >
+                              {record.status}
+                            </Tag>
+                          </Flex>
+                          {/* <Flex justify="space-between">
                           <strong>{record.departureAirport.shortLabel}</strong>
                           <IoAirplane />{" "}
                           <strong>{record.arrivalAirport.shortLabel}</strong>
-                        </Flex>
-                        <Divider style={{ margin: "0.5rem" }} />
-                        <Space direction="vertical">
-                          <p>
-                            Departure:{" "}
-                            {formatUCTtoISO(record.dateOfDeparture.toString())}
-                          </p>
-                          <p>{record.numberOfPassengers} Passengers</p>
-                          <Tag
-                            color={
-                              record.status == "Fulfilled"
-                                ? "success"
-                                : record.status == "Cancelled"
-                                  ? "error"
-                                  : record.status == "Quoted"
-                                    ? "blue"
-                                    : "warning"
-                            }
-                          >
-                            {record.status}
-                          </Tag>
-                        </Space>
-                      </div>
-                    </Card>
-                  </Col>
-                )
+                        </Flex> */}
+                          <Divider style={{ margin: "0.5rem 0" }} />
+                          <Space direction="vertical" className="w-full">
+                            <Flex align="center" gap={4}>
+                              <LiaPlaneDepartureSolid />
+                              <p>
+                                {dayjs(record.trip[0].dateOfDeparture).format(
+                                  "DD MMM YYYY"
+                                )}
+                              </p>
+                            </Flex>
+                            <Flex align="center" justify="space-between" gap={4} className="w-full">
+                              <Flex align="center" gap={4}>
+                                <MdAirlineSeatReclineNormal />
+                                <p>
+                                  {record.numberOfPassengers.total} Passengers
+                                </p>
+                              </Flex>
+                              <Flex align="center" justify="end" gap={4}>
+                                {record.petsAllowed && <MdPets />}
+                                {record.smokingAllowed && <MdSmokingRooms />}
+                              </Flex>
+                            </Flex>
+                          </Space>
+                        </div>
+                      </Card>
+                    </Col>
+                  );
                 }
               )
             ) : (

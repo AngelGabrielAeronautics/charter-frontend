@@ -97,29 +97,23 @@ const AgencyFlights = () => {
     const uid = translator.new();
 
     const payload: IQuotationRequest = {
-      quotationRequestNumber: `QR-${uid}`,
-      departureAirport: searchFlightCriteria[0]
-        .departureAirportObject as IAirport,
-      arrivalAirport: searchFlightCriteria[0].arrivalAirportObject as IAirport,
-      dateOfDeparture: new Date(searchFlightCriteria[0].departureDate),
-      timeOfDeparture: searchFlightCriteria[0].departureTime,
-      customer: authenticatedUser as IUser,
-      numberOfChildren: 0,
-      numberOfInfants: 0,
-      numberOfPassengers: parseInt(
-        searchFlightCriteria[0].numberOfPassengers.toString()
-      ),
-      numberOfAdults: parseInt(
-        searchFlightCriteria[0].numberOfPassengers.toString()
-      ),
+      customerId: authenticatedUser?._id as string,
+      trip: [
+        {
+          departureAirport: searchFlightCriteria[0].departureAirportObject as IAirport,
+          arrivalAirport: searchFlightCriteria[0].arrivalAirportObject as IAirport,
+          dateOfDeparture: new Date(searchFlightCriteria[0].departureDate),
+          timeOfDeparture: searchFlightCriteria[0].departureTime,
+        },
+      ],
+      numberOfPassengers: {
+        total: searchFlightCriteria[0].numberOfPassengers,
+        adults: searchFlightCriteria[0].numberOfPassengers,
+        children: searchFlightCriteria[0].numberOfPassengers,
+        infants: searchFlightCriteria[0].numberOfPassengers,
+      },
       petsAllowed: false,
       smokingAllowed: false,
-      status: "Pending",
-      auditFields: {
-        createdBy: authenticatedUser?.displayName as string,
-        createdById: authenticatedUser?._id as string,
-        dateCreated: new Date(),
-      },
     };
 
     dispatch(create(payload));

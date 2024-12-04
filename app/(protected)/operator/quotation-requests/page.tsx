@@ -1,44 +1,17 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import {
-  ArrowUpOutlined,
-  DownCircleFilled,
-  EditFilled,
-  FilterFilled,
-  SearchOutlined,
-} from "@ant-design/icons";
-import {
-  Button,
-  Divider,
-  Form,
-  Input,
-  Modal,
-  Select,
-  Space,
-  Table,
-  TableColumnsType,
-  Tag,
-} from "antd";
-import { ColumnProps } from "antd/es/table";
-import short from "short-uuid";
+import { Divider, TableColumnsType } from "antd";
+import dayjs from "dayjs";
 
 import DataTable from "@/app/components/DataTable";
 import QuotationRequestDrawer from "@/app/components/Drawers/QuotationRequestDrawer";
-import { getFormattedDate } from "@/app/helpers/DateHelper";
 
-import {
-  formatUCTtoISO,
-  getTimeFromDate,
-} from "@/lib/helpers/formatters.helpers";
-import { IUser } from "@/lib/models/IUser";
-import { IAirport } from "@/lib/models/airport.model";
 import { filterAssets } from "@/lib/state/assets/assets.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 import {
-  filterQuotationRequests,
-  findAll,
+  findByCountry,
   selectRecord,
 } from "@/lib/state/quotationRequests/quotationRequests.slice";
 import { filter } from "@/lib/state/quotations/quotations.slice";
@@ -70,31 +43,30 @@ const QuotationRequestsPage = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(
-      filterQuotationRequests({
-        $or: [
-          { "departureAirport.countryName": currentOperator?.country },
-          { "arrivalAirport.countryName": currentOperator?.country },
-        ],
-      })
-    );
+    dispatch(findByCountry({ country: currentOperator?.country }));
     if (authenticatedUser && authenticatedUser.operatorId) {
       dispatch(filterAssets(authenticatedUser.operatorId));
     }
     return () => {};
   }, [dispatch, authenticatedUser, currentOperator]);
 
-  const onRowClick = (record: IQuotationRequest) => {
-    dispatch(selectRecord(record));
-    dispatch(filter({ quotationRequestId: record._id }));
-    setShowDrawer(true);
-  };
-
   const customColumns: TableColumnsType<IQuotationRequest> = [
     {
-      title: "Date Of Departure",
-      dataIndex: "dateOfDeparture",
-      render: (_, record) => <p>{getFormattedDate(record.dateOfDeparture)}</p>,
+      title: "Number of Trip Legs",
+      dataIndex: "trip",
+      render: (trip) => <p>{trip.length} Legs</p>,
+    },
+    {
+      title: "Leg 1 Departure Date",
+      dataIndex: "trip",
+      render: (trip) => (
+        <p>{dayjs(trip[0].dateOfDeparture).format("DD MMM YYYY")}</p>
+      ),
+    },
+    {
+      title: "Number of Passengers",
+      dataIndex: "numberOfPassengers",
+      render: (value) => <p>{value.total} Passengers</p>,
     },
   ];
 
@@ -111,8 +83,19 @@ const QuotationRequestsPage = () => {
         canEdit={false}
         title="Quotation Requests"
         data={quotationRequests}
-        onRowClick={onRowClick}
-        hiddenColumns={["customer", "dateOfDeparture"]}
+        onRowClick={(record) => {
+          dispatch(selectRecord(record));
+          dispatch(filter({ quotationRequestId: record._id }));
+          setShowDrawer(true);
+        }}
+        hiddenColumns={[
+          "auditFields",
+          "customer",
+          "customerId",
+          "dateOfDeparture",
+          "trip",
+          "numberOfPassengers",
+        ]}
       />
       <QuotationRequestDrawer open={showDrawer} setOpen={setShowDrawer} />
     </div>

@@ -4,20 +4,14 @@ import { IAirport } from "./airport.model";
 
 export interface IQuotationRequest {
   _id?: string;
-  quotationRequestNumber: string; // e.g QR-20240716-010
-  status: "Fulfilled" | "Pending" | "Quoted" | "Cancelled"; //To be confirmed by @Given
-  departureAirport: IAirport;
-  arrivalAirport: IAirport;
-  dateOfDeparture: Date;
-  timeOfDeparture: string;
-  customer: IUser;
-  numberOfPassengers: number;
-  numberOfAdults: number;
-  numberOfChildren: number;
-  numberOfInfants: number;
+  quotationRequestNumber?: string; // e.g QR-20240716-010
+  customerId?: string;
+  numberOfPassengers: IPassengerCount;
+  trip: ITripLeg[]
   petsAllowed: boolean;
   smokingAllowed: boolean;
-  auditFields: IAuditFields;
+  status?: "Fulfilled" | "Pending" | "Quoted" | "Cancelled"; //To be confirmed by @Given
+  auditFields?: IAuditFields;
 }
 
 export interface IQuotationRequestUpdateDTO {
@@ -32,4 +26,18 @@ export interface IQuotationRequestUpdateDTO {
   petsAllowed?: boolean;
   smokingAllowed?: boolean;
   auditFields?: IAuditFields;
+}
+
+export interface ITripLeg {
+  departureAirport: IAirport;
+  arrivalAirport: IAirport;
+  dateOfDeparture: Date;
+  timeOfDeparture: string;
+}
+
+export interface IPassengerCount {
+  total: number;
+  adults: number;
+  children: number;
+  infants: number;
 }

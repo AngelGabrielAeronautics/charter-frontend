@@ -56,6 +56,18 @@ export default class QuotationRequestService extends BaseService {
     return response.data;
   };
 
+  findByCountry = async (payload: any) => {
+    const response = await axios.post(
+      `${this.baseUrl}/${this.subject}/findByCountry`,
+      payload,
+      {
+        headers: this.headers,
+      }
+    );
+
+    return response.data;
+  };
+
   findByFilter = async (payload: any) => {
     const response = await axios.post(
       `${this.baseUrl}/${this.subject}/filter`,
