@@ -12,6 +12,7 @@ import {
   Button,
   Card,
   Col,
+  Collapse,
   DatePicker,
   Descriptions,
   Divider,
@@ -147,7 +148,7 @@ const QuotationRequestDrawer = ({
       });
       setQuotationFormVisible(false);
     }
-    return () => {};
+    return () => { };
   }, [success.createRecord]);
 
   useEffect(() => {
@@ -167,7 +168,7 @@ const QuotationRequestDrawer = ({
       dispatch(resetActionStates());
       dispatch(setSelectedQuotation(undefined));
     }
-    return () => {};
+    return () => { };
   }, [success.updateRecord, selectedQuotation, dispatch]);
 
   useEffect(() => {
@@ -732,45 +733,10 @@ const QuotationRequestDrawer = ({
           </Flex>
           <Flex gap={16} style={{ width: "100%" }}>
             <Form.Item
-              label="Flight Duration"
-              name="flightDuration"
-              rules={[{ required: true }]}
-              style={{ width: "100%" }}
-            >
-              <Flex gap={16} style={{ width: "100%" }}>
-                <Form.Item
-                  noStyle
-                  name="flightDurationHours"
-                  style={{ width: "100%" }}
-                >
-                  <InputNumber
-                    min={0}
-                    max={30}
-                    step={1}
-                    style={{ width: "100%" }}
-                    addonAfter="hours"
-                  />
-                </Form.Item>
-                <Form.Item
-                  noStyle
-                  name="flightDurationMinutes"
-                  style={{ width: "100%" }}
-                >
-                  <InputNumber
-                    min={0}
-                    max={59}
-                    step={5}
-                    style={{ width: "100%" }}
-                    addonAfter="minutes"
-                  />
-                </Form.Item>
-              </Flex>
-            </Form.Item>
-            <Form.Item
               label="Seat Price"
               name="seatPrice"
               rules={[{ required: true }]}
-              style={{ width: "100%" }}
+              style={{ width: "33%" }}
             >
               <InputNumber
                 min={0}
@@ -780,16 +746,14 @@ const QuotationRequestDrawer = ({
                 style={{ width: "100%" }}
               />
             </Form.Item>
-          </Flex>
-          <Flex gap={16} style={{ width: "100%" }}>
             <Form.Item
               label="Valid Until"
               name="expirationDate"
               rules={[{ required: true }]}
-              style={{ width: "50%" }}
+              style={{ width: "33%" }}
             >
               <DatePicker
-                onChange={(date, dateString) => {}}
+                onChange={(date, dateString) => { }}
                 minDate={dayjs().add(1, "day")}
                 style={{ width: "100%" }}
               />
@@ -797,7 +761,7 @@ const QuotationRequestDrawer = ({
             <Form.Item
               label="Offer expiry hours prior to flight"
               name="offerExpiryHoursPriorToFlight"
-              style={{ width: "50%" }}
+              style={{ width: "33%" }}
             >
               <InputNumber
                 min={0}
@@ -808,122 +772,193 @@ const QuotationRequestDrawer = ({
               />
             </Form.Item>
           </Flex>
-          <Flex gap={16} style={{ width: "100%" }}>
-            <Form.Item
-              label="Departure Date"
-              name="departureDate"
-              rules={[{ required: true }]}
-              style={{ width: "100%" }}
-            >
-              <DatePicker
-                // defaultValue={dayjs(selectedQuotationRequest?.dateOfDeparture)}
-                // defaultPickerValue={dayjs(
-                //   selectedQuotationRequest?.dateOfDeparture
-                // )}
-                onChange={(date, dateString) => {}}
-                minDate={dayjs().add(1, "day")}
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-            <Form.Item
-              label="Departure Meeting Place"
-              name="departureMeetingPlace"
-              rules={[{ required: true }]}
-              style={{ width: "100%" }}
-            >
-              <Input
-                style={{ width: "100%" }}
-                addonAfter={<EnvironmentOutlined />}
-              />
-            </Form.Item>
-            <Form.Item
-              label="Departure Meeting Time"
-              name="departureMeetingTime"
-              rules={[{ required: true }]}
-              style={{ width: "100%" }}
-            >
-              <TimePicker
-                defaultValue={dayjs("12:08", "HH:mm")}
-                format={"HH:mm"}
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-          </Flex>
-          <Flex gap={16} style={{ width: "100%" }}>
-            <Form.Item
-              label="Arrival Date"
-              name="arrivalDate"
-              rules={[{ required: true }]}
-              style={{ width: "100%" }}
-            >
-              <DatePicker
-                onChange={(date, dateString) => {}}
-                minDate={dayjs().add(1, "day")}
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-            <Form.Item
-              label="Arrival Meeting Place"
-              name="arrivalMeetingPlace"
-              rules={[{ required: true }]}
-              style={{ width: "100%" }}
-            >
-              <Input
-                style={{ width: "100%" }}
-                addonAfter={<EnvironmentOutlined />}
-              />
-            </Form.Item>
-            <Form.Item
-              label="Arrival Meeting Time"
-              name="arrivalMeetingTime"
-              rules={[{ required: true }]}
-              style={{ width: "100%" }}
-            >
-              <TimePicker
-                defaultValue={dayjs("12:08", "HH:mm")}
-                format={"HH:mm"}
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-          </Flex>
-          <Flex gap={16} style={{ width: "100%" }}>
-            <Form.Item
-              layout="horizontal"
-              label="Flexible Date"
-              name="flexibleDate"
-              style={{ width: "100%" }}
-            >
-              <Switch
-                checkedChildren="Yes"
-                unCheckedChildren="No"
-                defaultValue={false}
-              />
-            </Form.Item>
-            <Form.Item
-              layout="horizontal"
-              label="Flexible Departure Time"
-              name="flexibleDepartureTime"
-              style={{ width: "100%" }}
-            >
-              <Switch
-                checkedChildren="Yes"
-                unCheckedChildren="No"
-                defaultValue={false}
-              />
-            </Form.Item>
-            <Form.Item
-              layout="horizontal"
-              label="Flexible Routing"
-              name="flexibleRouting"
-              style={{ width: "100%" }}
-            >
-              <Switch
-                checkedChildren="Yes"
-                unCheckedChildren="No"
-                defaultValue={false}
-              />
-            </Form.Item>
-          </Flex>
+          <h5>Trip Legs</h5>
+          <Collapse
+            accordion
+            items={selectedQuotationRequest?.trip.map(
+              (tripLeg: ITripLeg, index: number) => {
+                return {
+                  key: index + 1,
+                  label: <Flex justify="space-between">
+                    <div>
+                      <h5 className="mb-1">
+                        {tripLeg.departureAirport?.shortLabel}
+                      </h5>
+                      <Flex align="center" gap={4}>
+                        <LiaPlaneDepartureSolid />
+                        <p className="mr-4">
+                          {dayjs(tripLeg.dateOfDeparture).format("DD MMM YYYY")}
+                        </p>
+                        <ClockCircleOutlined />
+                        <p>{tripLeg.timeOfDeparture}</p>
+                      </Flex>
+                    </div>
+                    <IoAirplane size={16} color="#0B3746" className="mt-1" />{" "}
+                    <div className="text-end">
+                      <h5>{tripLeg.arrivalAirport?.shortLabel}</h5>
+                    </div>
+                  </Flex>,
+                  children: (
+                    <div>
+                      <Flex gap={16} style={{ width: "100%" }}>
+                        <Form.Item
+                          label="Departure Date"
+                          name="departureDate"
+                          rules={[{ required: true }]}
+                          style={{ width: "100%" }}
+                        >
+                          <DatePicker
+                            defaultValue={dayjs(tripLeg.dateOfDeparture)}
+                            defaultPickerValue={dayjs(tripLeg.dateOfDeparture)}
+                            onChange={(date, dateString) => { }}
+                            minDate={dayjs().add(1, "day")}
+                            style={{ width: "100%" }}
+                          />
+                        </Form.Item>
+                        <Form.Item
+                          label="Departure Meeting Place"
+                          name="departureMeetingPlace"
+                          rules={[{ required: true }]}
+                          style={{ width: "100%" }}
+                        >
+                          <Input
+                            style={{ width: "100%" }}
+                            addonAfter={<EnvironmentOutlined />}
+                          />
+                        </Form.Item>
+                        <Form.Item
+                          label="Departure Meeting Time"
+                          name="departureMeetingTime"
+                          rules={[{ required: true }]}
+                          style={{ width: "100%" }}
+                        >
+                          <TimePicker
+                            defaultValue={dayjs("12:08", "HH:mm")}
+                            format={"HH:mm"}
+                            style={{ width: "100%" }}
+                          />
+                        </Form.Item>
+                      </Flex>
+                      <Flex gap={16} style={{ width: "100%" }}>
+                        <Form.Item
+                          label="Arrival Date"
+                          name="arrivalDate"
+                          rules={[{ required: true }]}
+                          style={{ width: "100%" }}
+                        >
+                          <DatePicker
+                            onChange={(date, dateString) => { }}
+                            minDate={dayjs().add(1, "day")}
+                            style={{ width: "100%" }}
+                          />
+                        </Form.Item>
+                        <Form.Item
+                          label="Arrival Meeting Place"
+                          name="arrivalMeetingPlace"
+                          rules={[{ required: true }]}
+                          style={{ width: "100%" }}
+                        >
+                          <Input
+                            style={{ width: "100%" }}
+                            addonAfter={<EnvironmentOutlined />}
+                          />
+                        </Form.Item>
+                        <Form.Item
+                          label="Arrival Meeting Time"
+                          name="arrivalMeetingTime"
+                          rules={[{ required: true }]}
+                          style={{ width: "100%" }}
+                        >
+                          <TimePicker
+                            defaultValue={dayjs("12:08", "HH:mm")}
+                            format={"HH:mm"}
+                            style={{ width: "100%" }}
+                          />
+                        </Form.Item>
+                      </Flex>
+                      <Row>
+                        <Col span={16}>
+                          <Form.Item
+                            label="Flight Duration"
+                            name="flightDuration"
+                            rules={[{ required: true }]}
+                            style={{ width: "100%" }}
+                          >
+                            <Flex gap={16} style={{ width: "100%" }}>
+                              <Form.Item
+                                noStyle
+                                name="flightDurationHours"
+                                style={{ width: "100%" }}
+                              >
+                                <InputNumber
+                                  min={0}
+                                  max={30}
+                                  step={1}
+                                  style={{ width: "100%" }}
+                                  addonAfter="hours"
+                                />
+                              </Form.Item>
+                              <Form.Item
+                                noStyle
+                                name="flightDurationMinutes"
+                                style={{ width: "100%" }}
+                              >
+                                <InputNumber
+                                  min={0}
+                                  max={59}
+                                  step={5}
+                                  style={{ width: "100%" }}
+                                  addonAfter="minutes"
+                                />
+                              </Form.Item>
+                            </Flex>
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                      <Flex gap={16} style={{ width: "100%" }}>
+                        <Form.Item
+                          layout="horizontal"
+                          label="Flexible Date"
+                          name="flexibleDate"
+                          style={{ width: "100%" }}
+                        >
+                          <Switch
+                            checkedChildren="Yes"
+                            unCheckedChildren="No"
+                            defaultValue={false}
+                          />
+                        </Form.Item>
+                        <Form.Item
+                          layout="horizontal"
+                          label="Flexible Departure Time"
+                          name="flexibleDepartureTime"
+                          style={{ width: "100%" }}
+                        >
+                          <Switch
+                            checkedChildren="Yes"
+                            unCheckedChildren="No"
+                            defaultValue={false}
+                          />
+                        </Form.Item>
+                        <Form.Item
+                          layout="horizontal"
+                          label="Flexible Routing"
+                          name="flexibleRouting"
+                          style={{ width: "100%" }}
+                        >
+                          <Switch
+                            checkedChildren="Yes"
+                            unCheckedChildren="No"
+                            defaultValue={false}
+                          />
+                        </Form.Item>
+                      </Flex>
+                    </div>
+                  ),
+                };
+              }
+            )}
+          />
         </Form>
       </Drawer>
     </Drawer>
