@@ -41,6 +41,7 @@ import { IAirport } from "@/lib/models/airport.model";
 import { createFederatedAccount, login } from "@/lib/state/auth/auth.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 import { create } from "@/lib/state/quotationRequests/quotationRequests.slice";
+import { ISearchItem } from "@/lib/models/search.model";
 
 const socialButtonStyle = {
   width: "100%",
@@ -69,29 +70,24 @@ const Login = () => {
   const { loading } = useAppSelector((state) => state.quotationsRequests);
 
   const submitQuotationRequest = () => {
-    const translator = short();
-    const uid = translator.new();
+    const trip = searchFlightCriteria.map((item: ISearchItem) => ({
+      departureAirport: item.departureAirportObject as IAirport,
+      arrivalAirport: item.arrivalAirportObject as IAirport,
+      dateOfDeparture: new Date(item.departureDate),
+      timeOfDeparture: item.departureTime,
+    }))
 
     const payload: IQuotationRequest = {
-      quotationRequestNumber: `QR-${uid}`,
-      departureAirport: searchFlightCriteria[0]
-        .departureAirportObject as IAirport,
-      arrivalAirport: searchFlightCriteria[0].arrivalAirportObject as IAirport,
-      dateOfDeparture: new Date(searchFlightCriteria[0].departureDate),
-      timeOfDeparture: searchFlightCriteria[0].departureTime,
-      customer: authenticatedUser as IUser,
-      numberOfPassengers: searchFlightCriteria[0].numberOfPassengers,
-      numberOfAdults: searchFlightCriteria[0].numberOfPassengers,
-      numberOfChildren: 0,
-      numberOfInfants: 0,
+      trip,
+      customerId: authenticatedUser?._id as string,
+      numberOfPassengers: {
+        total: searchFlightCriteria[0].numberOfPassengers,
+        adults: searchFlightCriteria[0].numberOfPassengers,
+        children: searchFlightCriteria[0].numberOfPassengers,
+        infants: searchFlightCriteria[0].numberOfPassengers
+      },
       petsAllowed: false,
       smokingAllowed: false,
-      status: "Pending",
-      auditFields: {
-        createdBy: authenticatedUser?.displayName as string,
-        createdById: authenticatedUser?._id as string,
-        dateCreated: new Date(),
-      },
     };
 
     dispatch(create(payload));
