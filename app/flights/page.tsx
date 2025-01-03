@@ -113,8 +113,8 @@ const Flights = () => {
         message: "Quotation Request Created Successfully",
       })
       dispatch(resetActionStates());
-      // dispatch(resetFlightCriteria());
-      // router.push('/quotation-requests')
+      dispatch(resetFlightCriteria());
+      router.push('/quotation-requests')
     }
     return () => {};
   }, [loading, success]);

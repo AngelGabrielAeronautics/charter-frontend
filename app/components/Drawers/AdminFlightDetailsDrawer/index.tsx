@@ -1,19 +1,13 @@
 import React, { useState } from "react";
 
-
-
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { Drawer, Space, Tag } from "antd";
 
-
+import FlightChecklist from "@/app/(protected)/admin/flights/flight-checklist";
 
 import { useAppSelector } from "@/lib/state/hooks";
 
-
-
 import AdminFlightDetailsComponent from "./admin-flight-details-component";
-import FlightChecklist from "@/app/(protected)/admin/flights/flight-checklist";
-
 
 interface FlightDetailProps {
   visible: boolean;

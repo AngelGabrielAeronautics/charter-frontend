@@ -8,14 +8,22 @@ import { PageHeader } from "@/app/components";
 import DataTable from "@/app/components/DataTable";
 import CreateFlightDrawer from "@/app/components/Drawers/CreateFlightDrawer";
 
-import { fetchFlights } from "@/lib/state/flights/flights.slice";
+import { fetchFlights, selectFlight } from "@/lib/state/flights/flights.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
+import FlightDetailsDrawer from "@/app/components/Drawers/FlightDetailsDrawer";
 
 const AdminFlights = () => {
   const { flights } = useAppSelector((state) => state.flights);
   const [createDrawerOpen, setCreateDrawerOpen] = useState(false);
 
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (flights) {
+      dispatch(selectFlight(flights[flights.length - 1]))
+    }
+    return () => {};
+  }, [flights]);
 
   useEffect(() => {
     dispatch(fetchFlights());
@@ -54,6 +62,9 @@ const AdminFlights = () => {
         data={flights}
         customCreateDrawer={createDrawerConfig}
       />
+      <FlightDetailsDrawer visible={true} onClose={() => {
+        console.log('FlightDetailsDrawer closed');
+      }} />
     </div>
   );
 };

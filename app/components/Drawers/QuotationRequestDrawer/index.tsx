@@ -37,7 +37,6 @@ import dayjs from "dayjs";
 import { IoMdDownload } from "react-icons/io";
 import { IoAirplane } from "react-icons/io5";
 import { LiaPlaneDepartureSolid } from "react-icons/lia";
-import short from "short-uuid";
 
 import {
   formatToMoneyWithCurrency,
@@ -74,7 +73,8 @@ const QuotationRequestDrawer = ({
   open: boolean;
   setOpen: (arg: boolean) => void;
 }) => {
-  const [form] = Form.useForm();
+  const [newQuotationForm] = Form.useForm();
+  const model = Form.useWatch("model", newQuotationForm);
 
   const [tripDetailsOpen, setTripDetailsOpen] = useState(false);
   const [operatorDetailsVisible, setOperatorDetailsVisible] = useState(false);
@@ -87,6 +87,9 @@ const QuotationRequestDrawer = ({
   );
   const { selectedQuotationRequest } = useAppSelector(
     (state) => state.quotationsRequests
+  );
+  const { currentOperator, createdOperator } = useAppSelector(
+    (state) => state.operators
   );
 
   const { assets } = useAppSelector((state) => state.assets);
@@ -130,7 +133,7 @@ const QuotationRequestDrawer = ({
       title: "Cancel Submission",
       content: "Are you sure you want to cancel this submission?",
       onOk: () => {
-        form.resetFields();
+        newQuotationForm.resetFields();
         setQuotationFormVisible(false);
       },
       okText: "Yes",
@@ -141,19 +144,19 @@ const QuotationRequestDrawer = ({
 
   useEffect(() => {
     if (success.createRecord) {
-      form.resetFields();
+      newQuotationForm.resetFields();
       notification.success({
         message: "Quotation Submitted",
         description: "Your quotation has been submitted successfully.",
       });
       setQuotationFormVisible(false);
     }
-    return () => { };
+    return () => {};
   }, [success.createRecord]);
 
   useEffect(() => {
     if (success.updateRecord && selectedQuotation) {
-      form.resetFields();
+      newQuotationForm.resetFields();
       notification.success({
         message:
           selectedQuotation.status == "Accepted"
@@ -168,7 +171,7 @@ const QuotationRequestDrawer = ({
       dispatch(resetActionStates());
       dispatch(setSelectedQuotation(undefined));
     }
-    return () => { };
+    return () => {};
   }, [success.updateRecord, selectedQuotation, dispatch]);
 
   useEffect(() => {
@@ -311,6 +314,13 @@ const QuotationRequestDrawer = ({
             />
           ) : undefined;
 
+          const operator = item.operatorId as IOperator;
+          const isCurrentOperatorQuotation =
+            operator._id == currentOperator?._id ||
+            operator._id == createdOperator?._id;
+
+          if (!isCurrentOperatorQuotation) return;
+
           return (
             <List.Item key={item._id}>
               <List.Item.Meta
@@ -339,7 +349,7 @@ const QuotationRequestDrawer = ({
                         {
                           key: "Operator",
                           label: "Operator",
-                          span: 3,
+                          span: 2,
                           children: (
                             <Flex>
                               <span>
@@ -359,9 +369,17 @@ const QuotationRequestDrawer = ({
                           ),
                         },
                         {
+                          key: "Price",
+                          label: "Price",
+                          span: 1,
+                          children: (
+                            <>{formatToMoneyWithCurrency(item.price.amount)}</>
+                          ),
+                        },
+                        {
                           key: "Aircraft",
                           label: "Aircraft",
-                          span: 3,
+                          span: 2,
                           children: (
                             <span>
                               {typeof item.aircraftId == "object"
@@ -377,20 +395,12 @@ const QuotationRequestDrawer = ({
                         {
                           key: "Validity",
                           label: "Valid Until",
-                          span: 2,
+                          span: 1,
                           children: (
                             <>
                               {formatUCTtoISO(item.expirationDate.toString())}{" "}
                               {getTimeFromDate(item.expirationDate.toString())}
                             </>
-                          ),
-                        },
-                        {
-                          key: "Price",
-                          label: "Price",
-                          span: 1,
-                          children: (
-                            <>{formatToMoneyWithCurrency(item.price.amount)}</>
                           ),
                         },
                       ]}
@@ -619,12 +629,7 @@ const QuotationRequestDrawer = ({
         open={quotationFormVisible}
         extra={
           <Space>
-            <Button
-              type="primary"
-              onClick={() => {
-                form.validateFields().then((value) => form.submit());
-              }}
-            >
+            <Button type="primary" onClick={() => newQuotationForm.submit()}>
               Submit
             </Button>
           </Space>
@@ -633,43 +638,82 @@ const QuotationRequestDrawer = ({
         <Form
           layout="vertical"
           id="submit-quotation-form"
-          form={form}
+          form={newQuotationForm}
           onFinish={(values) => {
-            const translator = short();
-            const uid = translator.new();
+            const tripDetails = Object.keys(values).reduce(
+              (acc: any[], key) => {
+                const match = key.match(/tripDetails\[(\d+)\]\.(\w+)/); // Match index and property name
+                if (match) {
+                  const [_, index, prop] = match;
+                  const i = parseInt(index, 10); // Convert index to a number
+                  acc[i] = acc[i] || {}; // Ensure the object exists
+
+                  switch (prop) {
+                    case "arrivalDate":
+                      acc[i].arrivalDate = values[key].format("DD/MM/YYYY");
+                      break;
+
+                    case "arrivalMeetingTime":
+                      acc[i].arrivalMeetingTime = values[key].format("HH:mm");
+                      break;
+
+                    case "departureDate":
+                      acc[i].departureDate = values[key].format("DD/MM/YYYY");
+                      break;
+
+                    case "departureMeetingTime":
+                      acc[i].departureMeetingTime = values[key].format("HH:mm");
+                      break;
+
+                    case "flexibleRouting":
+                      acc[i].flexibleRouting = values[key] ? true : false;
+                      break;
+
+                    case "flexibleDate":
+                      acc[i].flexibleDate = values[key] ? true : false;
+                      break;
+
+                    case "flexibleDepartureTime":
+                      acc[i].flexibleDepartureTime = values[key] ? true : false;
+                      break;
+
+                    default:
+                      acc[i][prop] = values[key]; // Assign the property
+                      break;
+                  }
+
+                  acc[i].flightDuration = "00:00";
+                  acc[i].arrivalAirport =
+                    selectedQuotationRequest?.trip[i].arrivalAirport;
+                  acc[i].departureAirport =
+                    selectedQuotationRequest?.trip[i].departureAirport;
+
+                  acc[i][prop] = values[key]; // Assign the property
+                  delete values[key]; // Remove the processed property from `data`
+                }
+                return acc;
+              },
+              []
+            ); // Start with an empty array
+            values.tripDetails = tripDetails;
             const payload: any = {
-              quotationNumber: `QT-${uid}`,
               quotationRequestId: selectedQuotationRequest?._id,
               status: "Submitted",
               aircraftId: values.aircraftId,
               operatorId: authenticatedUser?.operatorId,
-              flightDuration:
-                values.flightDurationHours + values.flightDurationMinutes / 60,
               flightDetails: {
                 operatorId: authenticatedUser?.operatorId,
                 aircraftId: values.aircraftId,
-                // departure: selectedQuotationRequest?.dateOfDeparture,
-                duration: values.flightDurationHours,
-                // departureAirport: selectedQuotationRequest?.departureAirport,
-                // arrivalAirport: selectedQuotationRequest?.arrivalAirport,
-                status: "Offered",
-                arrivalDate: values.arrivalDate,
-                arrivalMeetingArea: values.arrivalMeetingPlace,
-                arrivalMeetingTime: values.arrivalMeetingTime,
-                durationMinutes: values.flightDurationMinutes,
-                flexibleDate: values.flexibleDate,
-                flexibleDepartureTime: values.flexibleDepartureTime,
-                flexibleRouting: values.flexibleRouting,
-                checklist: {},
-                notes: [],
                 luggageWeightUnits: "kgs",
                 maxLuggagePerPerson: 30,
-                meetingArea: values.departureMeetingPlace,
-                meetingTime: values.departureMeetingTime,
+                trip: tripDetails,
                 offerExpiryHoursPriorToFlight:
                   values.offerExpiryHoursPriorToFlight,
-                passengers: [],
                 pricePerSeat: values.seatPrice,
+                status: "Offered",
+                checklist: {},
+                notes: [],
+                passengers: [],
               },
               price: {
                 amount: values.seatPrice,
@@ -691,9 +735,7 @@ const QuotationRequestDrawer = ({
               label="Aircraft Model"
               name="model"
               style={{ width: "100%" }}
-              rules={[
-                { required: true, message: "Please select the aircraft model" },
-              ]}
+              rules={[{ required: true, message: "Required" }]}
             >
               <Select
                 style={{ width: "100%" }}
@@ -712,22 +754,20 @@ const QuotationRequestDrawer = ({
               label="Aircraft Registration"
               name="aircraftId"
               style={{ width: "100%" }}
-              rules={[
-                {
-                  required: true,
-                  message: "Please select the aircraft registration number",
-                },
-              ]}
+              rules={[{ required: true, message: "Required" }]}
             >
               <Select
                 style={{ width: "100%" }}
                 placeholder="Select"
                 allowClear
-                options={assets.map((asset) => ({
-                  label: asset.registrationNumber,
-                  value: asset._id,
-                  key: asset._id,
-                }))}
+                disabled={!model}
+                options={assets
+                  .filter((item) => item.model == model)
+                  .map((asset) => ({
+                    label: asset.registrationNumber,
+                    value: asset._id,
+                    key: asset._id,
+                  }))}
               />
             </Form.Item>
           </Flex>
@@ -735,7 +775,7 @@ const QuotationRequestDrawer = ({
             <Form.Item
               label="Seat Price"
               name="seatPrice"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "Required" }]}
               style={{ width: "33%" }}
             >
               <InputNumber
@@ -749,11 +789,14 @@ const QuotationRequestDrawer = ({
             <Form.Item
               label="Valid Until"
               name="expirationDate"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "Required" }]}
+              initialValue={dayjs(
+                selectedQuotationRequest?.trip[0].dateOfDeparture
+              ).subtract(1, "day")}
               style={{ width: "33%" }}
             >
               <DatePicker
-                onChange={(date, dateString) => { }}
+                onChange={(date, dateString) => {}}
                 minDate={dayjs().add(1, "day")}
                 style={{ width: "100%" }}
               />
@@ -761,6 +804,8 @@ const QuotationRequestDrawer = ({
             <Form.Item
               label="Offer expiry hours prior to flight"
               name="offerExpiryHoursPriorToFlight"
+              rules={[{ required: true, message: "Required" }]}
+              initialValue={24}
               style={{ width: "33%" }}
             >
               <InputNumber
@@ -779,46 +824,50 @@ const QuotationRequestDrawer = ({
               (tripLeg: ITripLeg, index: number) => {
                 return {
                   key: index + 1,
-                  label: <Flex justify="space-between">
-                    <div>
-                      <h5 className="mb-1">
-                        {tripLeg.departureAirport?.shortLabel}
-                      </h5>
-                      <Flex align="center" gap={4}>
-                        <LiaPlaneDepartureSolid />
-                        <p className="mr-4">
-                          {dayjs(tripLeg.dateOfDeparture).format("DD MMM YYYY")}
-                        </p>
-                        <ClockCircleOutlined />
-                        <p>{tripLeg.timeOfDeparture}</p>
-                      </Flex>
-                    </div>
-                    <IoAirplane size={16} color="#0B3746" className="mt-1" />{" "}
-                    <div className="text-end">
-                      <h5>{tripLeg.arrivalAirport?.shortLabel}</h5>
-                    </div>
-                  </Flex>,
+                  label: (
+                    <Flex justify="space-between">
+                      <div>
+                        <h5 className="mb-1">
+                          {tripLeg.departureAirport?.shortLabel}
+                        </h5>
+                        <Flex align="center" gap={4}>
+                          <LiaPlaneDepartureSolid />
+                          <p className="mr-4">
+                            {dayjs(tripLeg.dateOfDeparture).format(
+                              "DD MMM YYYY"
+                            )}
+                          </p>
+                          <ClockCircleOutlined />
+                          <p>{tripLeg.timeOfDeparture}</p>
+                        </Flex>
+                      </div>
+                      <IoAirplane size={16} color="#0B3746" className="mt-1" />{" "}
+                      <div className="text-end">
+                        <h5>{tripLeg.arrivalAirport?.shortLabel}</h5>
+                      </div>
+                    </Flex>
+                  ),
                   children: (
                     <div>
                       <Flex gap={16} style={{ width: "100%" }}>
                         <Form.Item
                           label="Departure Date"
-                          name="departureDate"
+                          name={`tripDetails[${index}].departureDate`}
                           rules={[{ required: true }]}
+                          initialValue={dayjs(tripLeg.dateOfDeparture)}
                           style={{ width: "100%" }}
                         >
                           <DatePicker
                             defaultValue={dayjs(tripLeg.dateOfDeparture)}
                             defaultPickerValue={dayjs(tripLeg.dateOfDeparture)}
-                            onChange={(date, dateString) => { }}
                             minDate={dayjs().add(1, "day")}
                             style={{ width: "100%" }}
                           />
                         </Form.Item>
                         <Form.Item
                           label="Departure Meeting Place"
-                          name="departureMeetingPlace"
-                          rules={[{ required: true }]}
+                          name={`tripDetails[${index}].departureMeetingPlace`}
+                          rules={[{ required: true, message: "Required" }]}
                           style={{ width: "100%" }}
                         >
                           <Input
@@ -828,12 +877,15 @@ const QuotationRequestDrawer = ({
                         </Form.Item>
                         <Form.Item
                           label="Departure Meeting Time"
-                          name="departureMeetingTime"
+                          name={`tripDetails[${index}].departureMeetingTime`}
                           rules={[{ required: true }]}
+                          initialValue={dayjs(
+                            tripLeg.timeOfDeparture,
+                            "HH:mm"
+                          ).subtract(2, "hours")}
                           style={{ width: "100%" }}
                         >
                           <TimePicker
-                            defaultValue={dayjs("12:08", "HH:mm")}
                             format={"HH:mm"}
                             style={{ width: "100%" }}
                           />
@@ -842,20 +894,20 @@ const QuotationRequestDrawer = ({
                       <Flex gap={16} style={{ width: "100%" }}>
                         <Form.Item
                           label="Arrival Date"
-                          name="arrivalDate"
-                          rules={[{ required: true }]}
+                          name={`tripDetails[${index}].arrivalDate`}
+                          rules={[{ required: true, message: "Required" }]}
                           style={{ width: "100%" }}
                         >
                           <DatePicker
-                            onChange={(date, dateString) => { }}
+                            onChange={(date, dateString) => {}}
                             minDate={dayjs().add(1, "day")}
                             style={{ width: "100%" }}
                           />
                         </Form.Item>
                         <Form.Item
                           label="Arrival Meeting Place"
-                          name="arrivalMeetingPlace"
-                          rules={[{ required: true }]}
+                          name={`tripDetails[${index}].arrivalMeetingPlace`}
+                          rules={[{ required: true, message: "Required" }]}
                           style={{ width: "100%" }}
                         >
                           <Input
@@ -865,12 +917,15 @@ const QuotationRequestDrawer = ({
                         </Form.Item>
                         <Form.Item
                           label="Arrival Meeting Time"
-                          name="arrivalMeetingTime"
-                          rules={[{ required: true }]}
+                          name={`tripDetails[${index}].arrivalMeetingTime`}
+                          initialValue={dayjs("12:00", "HH:mm").subtract(
+                            2,
+                            "hours"
+                          )}
+                          rules={[{ required: true, message: "Required" }]}
                           style={{ width: "100%" }}
                         >
                           <TimePicker
-                            defaultValue={dayjs("12:08", "HH:mm")}
                             format={"HH:mm"}
                             style={{ width: "100%" }}
                           />
@@ -880,14 +935,15 @@ const QuotationRequestDrawer = ({
                         <Col span={16}>
                           <Form.Item
                             label="Flight Duration"
-                            name="flightDuration"
-                            rules={[{ required: true }]}
                             style={{ width: "100%" }}
                           >
                             <Flex gap={16} style={{ width: "100%" }}>
                               <Form.Item
                                 noStyle
-                                name="flightDurationHours"
+                                name={`tripDetails[${index}].flightDurationHours`}
+                                rules={[
+                                  { required: true, message: "Required" },
+                                ]}
                                 style={{ width: "100%" }}
                               >
                                 <InputNumber
@@ -900,7 +956,7 @@ const QuotationRequestDrawer = ({
                               </Form.Item>
                               <Form.Item
                                 noStyle
-                                name="flightDurationMinutes"
+                                name={`tripDetails[${index}].flightDurationMinutes`}
                                 style={{ width: "100%" }}
                               >
                                 <InputNumber
@@ -919,37 +975,40 @@ const QuotationRequestDrawer = ({
                         <Form.Item
                           layout="horizontal"
                           label="Flexible Date"
-                          name="flexibleDate"
+                          name={`tripDetails[${index}].flexibleDate`}
+                          initialValue={false}
+                          valuePropName="checked"
                           style={{ width: "100%" }}
                         >
                           <Switch
                             checkedChildren="Yes"
                             unCheckedChildren="No"
-                            defaultValue={false}
                           />
                         </Form.Item>
                         <Form.Item
                           layout="horizontal"
                           label="Flexible Departure Time"
-                          name="flexibleDepartureTime"
+                          name={`tripDetails[${index}].flexibleDepartureTime`}
+                          initialValue={false}
+                          valuePropName="checked"
                           style={{ width: "100%" }}
                         >
                           <Switch
                             checkedChildren="Yes"
                             unCheckedChildren="No"
-                            defaultValue={false}
                           />
                         </Form.Item>
                         <Form.Item
                           layout="horizontal"
                           label="Flexible Routing"
-                          name="flexibleRouting"
+                          name={`tripDetails[${index}].flexibleRouting`}
+                          initialValue={false}
+                          valuePropName="checked"
                           style={{ width: "100%" }}
                         >
                           <Switch
                             checkedChildren="Yes"
                             unCheckedChildren="No"
-                            defaultValue={false}
                           />
                         </Form.Item>
                       </Flex>

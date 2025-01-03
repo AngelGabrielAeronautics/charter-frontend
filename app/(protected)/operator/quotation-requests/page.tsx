@@ -35,7 +35,7 @@ const QuotationRequestsPage = () => {
   const [showDrawer, setShowDrawer] = useState(false);
 
   const { authenticatedUser } = useAppSelector((state) => state.auth);
-  const { currentOperator } = useAppSelector((state) => state.operators);
+  const { currentOperator, createdOperator } = useAppSelector((state) => state.operators);
   const { quotationRequests } = useAppSelector(
     (state) => state.quotationsRequests
   );
@@ -43,7 +43,7 @@ const QuotationRequestsPage = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(findByCountry({ country: currentOperator?.country }));
+    dispatch(findByCountry({ country: currentOperator?.country ?? createdOperator?.country }));
     if (authenticatedUser && authenticatedUser.operatorId) {
       dispatch(filterAssets(authenticatedUser.operatorId));
     }
