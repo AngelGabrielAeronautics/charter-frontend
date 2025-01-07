@@ -22,17 +22,20 @@ export interface IAuthState {
     resetPassword: boolean,
     createAccount: boolean,
     authenticate: boolean,
+    signOut: boolean,
   };
   loading: {
     updatePassword: boolean,
     resetPassword: boolean,
     createAccount: boolean,
     authenticate: boolean,
+    signOut: boolean,
   };
   error: {
     updatePassword: string | null,
     resetPassword: string | null,
     createAccount: string | null,
     authenticate: string | null,
+    signOut: string | null,
   };
 }

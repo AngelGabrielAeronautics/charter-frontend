@@ -41,18 +41,21 @@ const initialState: IAuthState = {
     resetPassword: false,
     createAccount: false,
     authenticate: false,
+    signOut: false,
   },
   loading: {
     updatePassword: false,
     resetPassword: false,
     createAccount: false,
     authenticate: false,
+    signOut: false,
   },
   error: {
     updatePassword: null,
     resetPassword: null,
     createAccount: null,
     authenticate: null,
+    signOut: null,
   },
   notify: {
     shouldNotify: false,
@@ -254,9 +257,22 @@ export const AuthSlice = createSlice({
         state.resettingPassword = false;
         state.redirect = { shouldRedirect: true, redirectPath: eRoutes.login };
       })
+      .addCase(signOut.pending, (state) => {
+        state.loading.signOut = true;
+        state.success.signOut = false;
+        state.error.signOut = null;
+      })
       .addCase(signOut.fulfilled, (state) => {
+        state.loading.signOut = false;
+        state.success.signOut = true;
         state.isAuthenticated = false;
         state.authenticatedUser = undefined;
+      })
+      .addCase(signOut.rejected, (state, action: any) => {
+        console.log("Sign out failed! Payload =>", action.payload ?? " undefined")
+        console.log("Sign out failed! Error message =>", action.payload?.error?.message ?? "No message - Something went wrong...")
+        state.loading.signOut = false;
+        state.error.signOut = action.payload?.error?.message ?? "Sign out failed! Something went wrong...";
       })
       .addCase(login.pending, (state) => {
         state.authenticating = true;

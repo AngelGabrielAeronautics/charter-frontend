@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 import type { MenuProps } from "antd";
@@ -8,7 +8,7 @@ import { Menu } from "antd";
 
 import { getRoutes } from "@/app/(config)/routes";
 
-import { signOut } from "@/lib/state/auth/auth.slice";
+import { resetActionStates, signOut } from "@/lib/state/auth/auth.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 
 type MenuItem = Required<MenuProps>["items"][number];
@@ -16,8 +16,9 @@ type MenuItem = Required<MenuProps>["items"][number];
 const SideNavigation: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([""]);
 
-  const { authenticatedUser } = useAppSelector((state) => state.auth);
+  const { authenticatedUser, isAuthenticated, success, loading, error } = useAppSelector((state) => state.auth);
 
+  const router = useRouter();
   const pathname = usePathname();
   const dispatch = useAppDispatch();
 
@@ -42,6 +43,13 @@ const SideNavigation: React.FC = () => {
 
     setSelectedKeys([pathSuffix]);
   }, [pathname]);
+
+  useEffect(() => {
+    if (success.signOut && !loading.signOut && !error.signOut && !isAuthenticated && !authenticatedUser && router) {
+      router.replace("/login")
+      dispatch(resetActionStates())
+    }
+  }, [success, loading, error, router]);
 
   return (
     <Menu
