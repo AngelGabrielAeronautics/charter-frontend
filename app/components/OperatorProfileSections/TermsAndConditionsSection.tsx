@@ -36,14 +36,23 @@ const TermsAndConditionsSection = ({}: IProps) => {
       className="space-y-4"
       onFinish={handleFinish}
       initialValues={{
-        cancellationPolicy: currentOperator?.cancellationPolicy,
-        refundPolicy: currentOperator?.refundPolicy,
+        cancellationPolicy: currentOperator?.cancellationPolicy ?? "",
+        refundPolicy: currentOperator?.refundPolicy ?? "",
+        termsAndConditions: currentOperator?.termsAndConditions ?? "",
       }}
     >
+      <Form.Item label="Terms and Conditions" name="termsAndConditions">
+        <Input.TextArea
+          placeholder="Add your company's terms and conditions"
+          autoSize={{ minRows: 4 }}
+          style={{ maxHeight: "200px", overflowY: "auto" }}
+        />
+      </Form.Item>
+
       <Form.Item label="Cancellation Terms" name="cancellationPolicy">
         <Input.TextArea
           placeholder="Add your company's cancellation terms"
-          autoSize={{ minRows: 4, maxRows: 10 }}
+          autoSize={{ minRows: 4 }}
           style={{ maxHeight: "200px", overflowY: "auto" }}
         />
       </Form.Item>
@@ -51,7 +60,7 @@ const TermsAndConditionsSection = ({}: IProps) => {
       <Form.Item label="Refund Policy" name="refundPolicy">
         <Input.TextArea
           placeholder="Add your company's refund policy"
-          autoSize={{ minRows: 4, maxRows: 10 }}
+          autoSize={{ minRows: 4 }}
           style={{ maxHeight: "200px", overflowY: "auto" }}
         />
       </Form.Item>

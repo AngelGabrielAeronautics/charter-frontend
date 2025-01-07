@@ -4,6 +4,7 @@ import { IFile } from "./file.model";
 export interface IUser {
   country?: any;
   phoneNumber?: any;
+  phone?: any;
   surname?: any;
   _id?: string;
   firstNames: string;

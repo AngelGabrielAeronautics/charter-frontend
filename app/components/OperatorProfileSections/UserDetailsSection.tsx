@@ -65,7 +65,7 @@ const UserDetailsSection = ({ noButton = false }: IProps) => {
           firstNames: authenticatedUser.firstNames,
           lastName: authenticatedUser.lastName,
           email: authenticatedUser.email,
-          phoneNumber: authenticatedUser.phoneNumber,
+          phoneNumber: authenticatedUser.phone,
           country: currentOperator.country,
         });
         authenticatedUser.photoUrl &&
@@ -240,7 +240,7 @@ const UserDetailsSection = ({ noButton = false }: IProps) => {
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item label="Mobile Number" name="phoneNumber">
+          <Form.Item label="Mobile Number" name="phone">
             <Input
               size="large"
               type="text"
@@ -248,7 +248,7 @@ const UserDetailsSection = ({ noButton = false }: IProps) => {
               autoComplete="off"
               allowClear
               prefix={<span>{userDialCode}</span>}
-              value={authenticatedUser?.phoneNumber || ""} // add a default value to avoid undefined
+              value={authenticatedUser?.phone || ""} // add a default value to avoid undefined
             />
           </Form.Item>
         </Col>
