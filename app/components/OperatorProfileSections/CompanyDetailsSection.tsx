@@ -129,7 +129,7 @@ const CompanyDetailsSection = ({}: IProps) => {
         "bankingDetails.accountNumber":
           rest.bankingDetails?.accountNumber || "",
         "bankingDetails.accountType": rest.bankingDetails?.accountType || "",
-        "address.country": rest.address.country,
+        "address.country": rest.country || "",
       });
       setLogoFileList([
         {
