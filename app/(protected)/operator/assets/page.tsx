@@ -1,10 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 
 
 import { Descriptions, Divider, TableColumnType } from "antd";
+import dayjs from "dayjs";
 
 
 
@@ -18,26 +20,30 @@ import EditAssetDrawer from "@/app/components/editAssetDrawer";
 import { IAsset } from "@/lib/models/IAssets";
 import { filter } from "@/lib/state/assets/assets.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
-import dayjs from "dayjs";
 
 
 const Assets = () => {
   const { authenticatedUser } = useAppSelector((state) => state.auth);
   const { assets } = useAppSelector((state) => state.assets);
+  const { currentOperator } = useAppSelector((state) => state.operators);
   const [createDrawerOpen, setCreateDrawerOpen] = useState(false);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
 
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    const payload = { operatorId: authenticatedUser?.operatorId };
-    dispatch(filter(payload));
-    return () => {};
-  }, [dispatch]);
+  const fetchData = () => {
+    dispatch(filter({ operatorId: currentOperator?._id }));
+  };
 
-  const onCloseAssetDrawer = () => {
+  useEffect(() => {
+    if (currentOperator) fetchData();
+    return () => {};
+  }, [dispatch, currentOperator]);
+
+  const onCloseCreateDrawer = () => {
     setCreateDrawerOpen(false);
+    if (currentOperator) fetchData();
   };
 
   const onCloseEditDrawer = () => {
@@ -142,7 +148,7 @@ const Assets = () => {
     },
     drawer: (
       <CreateAssetsDrawer
-        onClose={onCloseAssetDrawer}
+        onClose={onCloseCreateDrawer}
         visible={createDrawerOpen}
       />
     ),
@@ -181,7 +187,12 @@ const Assets = () => {
         customCreateDrawer={createDrawerConfig}
         customColumns={columns}
         onSelectRow={handleEditAsset}
-        hiddenColumns={["operatorId", "baggageCompartmentMaxWeightUnits", "cargoCapacityUnits"]}
+        hiddenColumns={[
+          "operatorId",
+          "baggageCompartmentMaxWeightUnits",
+          "cargoCapacityUnits",
+          "airline", "cabinPressure"
+        ]}
       />
     </div>
   );

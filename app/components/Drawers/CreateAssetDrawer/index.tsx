@@ -1,29 +1,12 @@
 import React, { useEffect, useState } from "react";
 
+
+
 import { LoadingOutlined } from "@ant-design/icons";
-import {
-  Alert,
-  Button,
-  Col,
-  DatePicker,
-  Divider,
-  Drawer,
-  Flex,
-  Form,
-  GetProp,
-  Input,
-  Row,
-  Select,
-  Space,
-  Spin,
-  Switch,
-  Upload,
-  UploadFile,
-  UploadProps,
-  message,
-  notification,
-} from "antd";
+import { Alert, Button, Col, DatePicker, Divider, Drawer, Flex, Form, GetProp, Input, Row, Select, Space, Spin, Switch, Upload, UploadFile, UploadProps, message, notification } from "antd";
 import ImgCrop from "antd-img-crop";
+
+
 
 import { IAsset } from "@/lib/models/IAssets";
 import { IOperator } from "@/lib/models/IOperators";
@@ -31,7 +14,10 @@ import { create, resetActionStates } from "@/lib/state/assets/assets.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 import { fetchOperators } from "@/lib/state/operators/operators.slice";
 
+
+
 import { powerPlants } from "../../Assets/AddAsset";
+
 
 interface CreateAssetProps {
   visible: boolean;
@@ -115,7 +101,7 @@ const CreateAssetsDrawer: React.FC<CreateAssetProps> = ({
           numberOfCrew: parseInt(values.numberOfCrew),
           powerPlant: values.powerPlant,
           model: values.model,
-          suitableForUnpavedAirfield: false,
+          suitableForUnpavedAirfield: values.suitableForUnpavedAirfield,
           airConAvailable: values.airConAvailable,
           smokingAllowed: values.smokingAllowed,
           hasWashCloset: values.hasWashCloset,
@@ -544,7 +530,7 @@ const CreateAssetsDrawer: React.FC<CreateAssetProps> = ({
             </Col>
             <Col span={12}>
               <Form.Item
-                name="cabinPressure"
+                name="pressurized"
                 valuePropName="checked"
                 label="Is pressurized cabin?"
                 style={formItemStyle}
@@ -564,11 +550,6 @@ const CreateAssetsDrawer: React.FC<CreateAssetProps> = ({
                 <Switch checkedChildren="Yes" unCheckedChildren="No" />
               </Form.Item>
             </Col>
-            {/* <Col span={12}>
-						<Form.Item name='pressurized' valuePropName="checked" label='pressurized' style={formItemStyle} rules={[]}>
-							<Switch checkedChildren='Yes' unCheckedChildren='No' />
-						</Form.Item>
-					</Col> */}
             <Col span={12}>
               <Form.Item
                 name="heated"
