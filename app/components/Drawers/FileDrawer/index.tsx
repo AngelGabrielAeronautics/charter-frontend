@@ -13,7 +13,8 @@ import { API_BASE_URL } from "@/app/(config)/constants";
 
 
 import { eModules } from "@/lib/enums/modules.enums";
-import { useAppSelector } from "@/lib/state/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
+import { setCurrentOperator } from "@/lib/state/operators/operators.slice";
 
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
@@ -37,6 +38,8 @@ const UploadFileInfoDrawer: React.FC<CreateTaskProps> = ({
 
   const { authenticatedUser } = useAppSelector((state) => state.auth);
 
+  const dispatch = useAppDispatch();
+
   const uploadFile = (values: any) => {
     const formData = new FormData();
 
@@ -57,9 +60,12 @@ const UploadFileInfoDrawer: React.FC<CreateTaskProps> = ({
       }
     )
       .then((res) => res.json())
-      .then(() => {
+      .then((data) => {
         setFile(undefined);
-        message.success("Upload successfully.");
+        console.log('Updated Operator => ', data)
+        dispatch(setCurrentOperator(data))
+        message.success("Upload successful.");
+        onClose();
       })
       .catch(() => {
         message.error("Upload failed.");
