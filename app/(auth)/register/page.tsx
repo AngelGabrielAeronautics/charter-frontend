@@ -5,27 +5,24 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-import { LockOutlined, MailOutlined, UserOutlined } from "@ant-design/icons";
-import {
-  Alert,
-  Button,
-  Checkbox,
-  CheckboxProps,
-  Col,
-  Divider,
-  Flex,
-  Form,
-  Input,
-  Row,
-} from "antd";
+
+
+import { InfoCircleOutlined, LockOutlined, MailOutlined, UserOutlined } from "@ant-design/icons";
+import { Alert, Button, Checkbox, CheckboxProps, Col, Flex, Form, Input, List, Popover, Row, Space } from "antd";
+import { Rule } from "antd/es/form";
+
+
 
 import themeColors from "@/app/(config)/colors";
 import { eRoutes } from "@/app/(config)/routes";
 import UnauthenticatedLayout from "@/app/(layouts)/UnauthenticatedLayout";
 
+
+
 import { ISignUpPayload } from "@/lib/firebase/auth.service";
 import { createAccount } from "@/lib/state/auth/auth.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
+
 
 const GoogleIcon = () => (
   <Image
@@ -69,6 +66,8 @@ const Register = () => {
   const [password, setPassword] = useState<string>();
   const [confirmPassword, setConfirmPassword] = useState<string>();
 
+  const [form] = Form.useForm();
+
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -102,16 +101,46 @@ const Register = () => {
     return () => {};
   }, [isAuthenticated, authenticatedUser]);
 
-  const handleSignUp = () => {
-    if (email && password && firstNames && lastName) {
-      const data: ISignUpPayload = { email, firstNames, lastName, password };
-      dispatch(createAccount(data));
-    }
+  const handleFormSubmit = async (values: ISignUpPayload) => {
+    console.log("Form values", values);
+    dispatch(createAccount(values));
   };
 
   const checkboxOnChange: CheckboxProps["onChange"] = (e) => {
     setRememberMe(e.target.checked);
   };
+
+  const firstNameRules: Rule[] = [{ required: true, message: "Required" }];
+
+  const lastNameRules: Rule[] = [{ required: true, message: "Required" }];
+
+  const emailRules: Rule[] = [
+    { required: true, message: "Required" },
+    { type: "email", message: "Please provide a valid email" },
+  ];
+
+  const passwordRegex =
+    /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_\-+=|\\[\]{}:;'",.<>?/`~])(?=.{8,})/;
+
+  const passwordRules: Rule[] = [
+    { required: true, message: "Required" },
+    {
+      pattern: passwordRegex,
+      message: "Password is too weak",
+    },
+  ];
+
+  const confirmPasswordRules: Rule[] = [
+    { required: true, message: "Required" },
+    ({ getFieldValue }) => ({
+      validator(_, value) {
+        if (!value || getFieldValue("password") === value) {
+          return Promise.resolve();
+        }
+        return Promise.reject(new Error("Passwords do not match"));
+      },
+    }),
+  ];
 
   return (
     <UnauthenticatedLayout>
@@ -122,6 +151,8 @@ const Register = () => {
             style={{ minHeight: "65vh" }}
           >
             <Form
+              form={form}
+              onFinish={handleFormSubmit}
               layout="vertical"
               name="sign-up-form"
               className="auth-form w-full self-center text-start"
@@ -130,16 +161,6 @@ const Register = () => {
                 <AppLogo />
               </Link>
               <h2 className="mb-2">Sign up</h2>
-              {/* <p>Welcome! Select method to sign up</p> */}
-              {/* <Flex className='mt-4' gap={16}>
-								<Button icon={<GoogleIcon />} size='large' ghost style={socialButtonStyle}>
-									Google
-								</Button>
-								<Button icon={<FacebookIcon />} size='large' ghost style={socialButtonStyle}>
-									Facebook
-								</Button>
-							</Flex>
-							<Divider>or continue with email</Divider> */}
               {hasError && (
                 <Alert
                   message={errorMessage}
@@ -149,7 +170,12 @@ const Register = () => {
                 />
               )}
               <Flex gap={16}>
-                <Form.Item style={formItemStyle} label="First Names">
+                <Form.Item
+                  style={formItemStyle}
+                  label="First Names"
+                  name="firstNames"
+                  rules={firstNameRules}
+                >
                   <Input
                     variant="filled"
                     size="large"
@@ -164,7 +190,12 @@ const Register = () => {
                     prefix={<UserOutlined style={{ marginRight: ".5rem" }} />}
                   />
                 </Form.Item>
-                <Form.Item style={formItemStyle} label="Last Name">
+                <Form.Item
+                  style={formItemStyle}
+                  label="Last Name"
+                  name="lastName"
+                  rules={lastNameRules}
+                >
                   <Input
                     variant="filled"
                     size="large"
@@ -179,7 +210,12 @@ const Register = () => {
                   />
                 </Form.Item>
               </Flex>
-              <Form.Item style={formItemStyle} label="Email Address">
+              <Form.Item
+                style={formItemStyle}
+                label="Email Address"
+                name="email"
+                rules={emailRules}
+              >
                 <Input
                   variant="filled"
                   size="large"
@@ -194,27 +230,82 @@ const Register = () => {
                 />
               </Form.Item>
               <Flex gap={16}>
-                <Form.Item style={formItemStyle} label="Password">
+                <Form.Item
+                  name="password"
+                  style={formItemStyle}
+                  label={
+                    <Popover
+                      placement="right"
+                      content={
+                        <List
+                          className="w-[360px]"
+                          dataSource={[
+                            {
+                              id: "1",
+                              title:
+                                "Password must be at least 8 characters long",
+                              description:
+                                "Password must be at least 8 characters long",
+                            },
+                            {
+                              id: "2",
+                              title:
+                                "Password must contain at least one uppercase letter",
+                              description:
+                                "Password must contain at least one uppercase letter",
+                            },
+                            {
+                              id: "3",
+                              title:
+                                "Password must contain at least one number",
+                              description:
+                                "Password must contain at least one number",
+                            },
+                            {
+                              id: "4",
+                              title:
+                                "Password must contain at least one special character",
+                              description:
+                                "Password must contain at least one special character",
+                            },
+                          ]}
+                          renderItem={(item) => (
+                            <List.Item key={item.id}>
+                              <List.Item.Meta description={item.description} />
+                            </List.Item>
+                          )}
+                        />
+                      }
+                      title='What is a "Strong" password?'
+                    >
+                      Password <InfoCircleOutlined />
+                    </Popover>
+                  }
+                  rules={passwordRules}
+                >
                   <Input.Password
                     variant="filled"
                     size="large"
                     className="custom-field-input"
                     placeholder="Password"
-                    autoComplete=""
                     value={password}
                     style={inputStyle}
                     onChange={(event) => setPassword(event.target.value)}
                     prefix={<LockOutlined style={{ marginRight: ".5rem" }} />}
                   />
                 </Form.Item>
-                <Form.Item style={formItemStyle} label="Confirm Password">
+                <Form.Item
+                  name="confirmPassword"
+                  style={formItemStyle}
+                  label="Confirm Password"
+                  rules={confirmPasswordRules}
+                >
                   <Input.Password
                     variant="filled"
                     size="large"
                     className="custom-field-input"
                     placeholder="Confirm Password"
-                    autoComplete=""
-                    onPressEnter={handleSignUp}
+                    onPressEnter={() => form.submit()}
                     value={confirmPassword}
                     style={inputStyle}
                     onChange={(event) => setConfirmPassword(event.target.value)}
@@ -228,7 +319,7 @@ const Register = () => {
                 </Checkbox>
               </Flex>
               <Form.Item style={formItemStyle}>
-                <Button type="primary" block onClick={handleSignUp}>
+                <Button type="primary" block htmlType="submit">
                   SIGN UP
                 </Button>
               </Form.Item>
