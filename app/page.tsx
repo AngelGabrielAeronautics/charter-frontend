@@ -1,5 +1,3 @@
-"use client";
-
 import ClientAppBar from "./components/ClientAppBar";
 import FlightSearch from "./components/SearchBox/FlightSearch";
 
@@ -14,7 +12,7 @@ export default function Home() {
     >
       <ClientAppBar />
       <div className="mb-28 mr-28 mt-32 h-full min-h-full self-end">
-        <h1 className="text-white">LAUNCHING 2024!</h1>
+        <h1 className="text-white">LAUNCHING 2025!</h1>
         <p className="text-2xl text-white">
           Compare quotes from <br />
           multiple charter operators <br />
