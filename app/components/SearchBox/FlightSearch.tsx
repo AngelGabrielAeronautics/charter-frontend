@@ -1,3 +1,5 @@
+"use client";
+
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -8,16 +10,7 @@ import {
   PlusOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
-import {
-  Button,
-  Divider,
-  Dropdown,
-  Form,
-  Input,
-  InputNumber,
-  Menu,
-  Space,
-} from "antd";
+import { Button, Divider, Dropdown, Form, Skeleton, Space } from "antd";
 import axios from "axios";
 import dayjs from "dayjs";
 
@@ -34,6 +27,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 import {
   AntButton,
   AntDatePicker,
+  AntForm,
   AntFormItem,
   AntInput,
   AntSelect,
@@ -41,7 +35,6 @@ import {
   FormControl,
   InputLabel,
 } from "./components.styled";
-import { AntForm } from "./components.styled";
 
 const tripActionStyle = {
   height: "65px",
@@ -61,6 +54,7 @@ const FlightSearch = () => {
     firstLeg: false,
     additionalLegs: false,
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -331,12 +325,28 @@ const FlightSearch = () => {
     runChecks();
   }, [form]);
 
+  useEffect(() => {
+    // Increased timeout to ensure styles are fully loaded
+    const timer = setTimeout(() => setIsLoading(false), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="w-full">
+        <Skeleton.Input active block style={{ height: 65, marginBottom: 16 }} />
+        <Skeleton.Input active block style={{ height: 65 }} />
+      </div>
+    );
+  }
+
   return (
     <AntForm
       layout="inline"
       form={form}
       onFinish={onFinish}
       id="flight-search-form"
+      style={{ opacity: isLoading ? 0 : 1, transition: "opacity 0.2s" }}
       initialValues={{
         time: dayjs("12:00", "HH:mm"),
       }}
