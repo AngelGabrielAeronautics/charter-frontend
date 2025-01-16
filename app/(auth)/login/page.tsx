@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import {
@@ -11,11 +11,9 @@ import {
   Checkbox,
   CheckboxProps,
   Col,
-  Divider,
   Form,
   Input,
   Row,
-  Spin,
 } from "antd";
 // Ensure Firebase auth is correctly imported
 import { FirebaseError } from "firebase/app";
@@ -23,25 +21,22 @@ import {
   FacebookAuthProvider,
   GoogleAuthProvider,
   fetchSignInMethodsForEmail,
-  linkWithCredential,
   signInWithPopup,
 } from "firebase/auth";
-import short from "short-uuid";
 
 import themeColors from "@/app/(config)/colors";
 import { eRoutes } from "@/app/(config)/routes";
 import UnauthenticatedLayout from "@/app/(layouts)/UnauthenticatedLayout";
-import { AppLogo, FacebookIcon, GoogleIcon } from "@/app/components/CustomIcon";
+import { AppLogo } from "@/app/components/CustomIcon";
 
 import { ISignInPayload } from "@/lib/firebase/auth.service";
 import { auth } from "@/lib/firebase/firebase";
 import { IQuotationRequest } from "@/lib/models/IQuotationRequest";
-import { IUser } from "@/lib/models/IUser";
 import { IAirport } from "@/lib/models/airport.model";
+import { ISearchItem } from "@/lib/models/search.model";
 import { createFederatedAccount, login } from "@/lib/state/auth/auth.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
 import { create } from "@/lib/state/quotationRequests/quotationRequests.slice";
-import { ISearchItem } from "@/lib/models/search.model";
 
 const socialButtonStyle = {
   width: "100%",
@@ -75,7 +70,7 @@ const Login = () => {
       arrivalAirport: item.arrivalAirportObject as IAirport,
       dateOfDeparture: new Date(item.departureDate),
       timeOfDeparture: item.departureTime,
-    }))
+    }));
 
     const payload: IQuotationRequest = {
       trip,
@@ -84,7 +79,7 @@ const Login = () => {
         total: searchFlightCriteria[0].numberOfPassengers,
         adults: searchFlightCriteria[0].numberOfPassengers,
         children: searchFlightCriteria[0].numberOfPassengers,
-        infants: searchFlightCriteria[0].numberOfPassengers
+        infants: searchFlightCriteria[0].numberOfPassengers,
       },
       petsAllowed: false,
       smokingAllowed: false,
@@ -226,7 +221,7 @@ const Login = () => {
               className="auth-form w-full self-center text-start"
             >
               <Link href={eRoutes.homePage}>
-                <AppLogo />
+                <AppLogo src="/images/charter-blue.svg" />
               </Link>
               <h2 className="mb-2">Log in to your Account</h2>
               {/* <p>Welcome back! Select method to log in</p>

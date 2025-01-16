@@ -25,9 +25,9 @@ export const AppLogo = ({ src = "/images/logo_blue.svg" }: IProps) => (
   <Image
     alt="logo"
     src={src}
-    width={100}
-    height={145}
+    width={80}
+    height={100}
     className="mb-8"
-    style={{ width: "20rem", height: "auto" }}
+    style={{ width: "15rem", height: "auto" }}
   />
 );
