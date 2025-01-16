@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
-import { MenuOutlined, UserOutlined } from "@ant-design/icons";
+import { UserOutlined } from "@ant-design/icons";
 import { Flex } from "antd";
 
 import { eRoutes } from "@/app/(config)/routes";
@@ -45,7 +44,7 @@ const ClientAppBar = ({ styles }: IProps) => {
     <Flex
       justify="space-between"
       align="center"
-      style={{ height: "120px", padding: "0 40px" }}
+      style={{ height: "80px", padding: "0 40px" }}
       className={`client-app-bar w-full ${pathname !== eRoutes.homePage ? "bg-light-primary" : ""} text-light-background`}
     >
       <Link
@@ -63,7 +62,7 @@ const ClientAppBar = ({ styles }: IProps) => {
             alignItems: "center",
           }}
         >
-          <AppLogo src="/images/logo_ivory.svg" />
+          <AppLogo src="/images/charterV2.svg" />
         </div>
       </Link>
       <Flex justify="end" align="center" gap={44}>

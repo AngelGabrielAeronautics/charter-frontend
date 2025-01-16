@@ -10,6 +10,9 @@ const config: Config = {
   ],
   theme: {
     colors: themeColors,
+    fontFamily: {
+      montserrat: ["Montserrat", "sans-serif"],
+    },
     extend: {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
