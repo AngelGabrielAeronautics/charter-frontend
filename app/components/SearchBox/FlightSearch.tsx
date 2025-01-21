@@ -28,7 +28,6 @@ import {
   AntButton,
   AntDatePicker,
   AntForm,
-  AntFormItem,
   AntInput,
   AntSelect,
   AntTimePicker,
@@ -75,18 +74,22 @@ const FlightSearch = () => {
 
   const handleInfantIncrement = () => {
     setInfantCount(infantCount + 1);
+    form.setFieldValue("seats", infantCount + childCount + 1);
   };
 
   const handleInfantDecrement = () => {
     if (infantCount > 0) setInfantCount(infantCount - 1);
+    form.setFieldValue("seats", infantCount + childCount + 1);
   };
 
   const handleChildIncrement = () => {
     setChildCount(childCount + 1);
+    form.setFieldValue("seats", infantCount + childCount + 1);
   };
 
   const handleChildDecrement = () => {
     if (childCount > 0) setChildCount(childCount - 1);
+    form.setFieldValue("seats", infantCount + childCount + 1);
   };
 
   const menu = (
@@ -410,8 +413,13 @@ const FlightSearch = () => {
           style={{ width: "16%" }}
         >
           <InputLabel>Date</InputLabel>
-          <Form.Item name="date" noStyle>
-            <AntDatePicker onChange={runChecks} />
+          <Form.Item name="date" initialValue={dayjs()} noStyle>
+            <AntDatePicker
+              onChange={runChecks}
+              disabledDate={(current) =>
+                current && current < dayjs().startOf("day")
+              }
+            />
           </Form.Item>
         </InnerAntFormItem>
         <InnerAntFormItem
@@ -440,6 +448,7 @@ const FlightSearch = () => {
             <AntInput
               type="number"
               min={1}
+              defaultValue={0}
               suffix={<TeamOutlined />}
               onChange={runChecks}
             />
@@ -461,7 +470,7 @@ const FlightSearch = () => {
               {fields.map(({ key, name, ...restField }) => {
                 return (
                   <FormControl key={key}>
-                    <AntFormItem
+                    <LeftAntFormItem
                       rules={[
                         {
                           required: true,
@@ -495,8 +504,8 @@ const FlightSearch = () => {
                           notFoundContent={null}
                         />
                       </Form.Item>
-                    </AntFormItem>
-                    <AntFormItem
+                    </LeftAntFormItem>
+                    <InnerAntFormItem
                       rules={[
                         {
                           required: true,
@@ -530,8 +539,8 @@ const FlightSearch = () => {
                           notFoundContent={null}
                         />
                       </Form.Item>
-                    </AntFormItem>
-                    <AntFormItem
+                    </InnerAntFormItem>
+                    <InnerAntFormItem
                       rules={[
                         {
                           required: true,
@@ -544,8 +553,8 @@ const FlightSearch = () => {
                       <Form.Item {...restField} name={[name, "date"]} noStyle>
                         <AntDatePicker onChange={runChecks} />
                       </Form.Item>
-                    </AntFormItem>
-                    <AntFormItem
+                    </InnerAntFormItem>
+                    <RightAntFormItem
                       initialValue={dayjs("12:00", "HH:mm")}
                       rules={[
                         {
@@ -562,7 +571,7 @@ const FlightSearch = () => {
                           onChange={runChecks}
                         />
                       </Form.Item>
-                    </AntFormItem>
+                    </RightAntFormItem>
                     <MinusCircleOutlined
                       onClick={() => {
                         remove(name);
