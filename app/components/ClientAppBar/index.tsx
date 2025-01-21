@@ -67,7 +67,15 @@ const ClientAppBar = ({ styles }: IProps) => {
       </Link>
       <Flex justify="end" align="center" gap={44}>
         <Link
-          href={eRoutes.clientFlights}
+          href={
+            signed_in && authenticatedUser
+              ? authenticatedUser.role === "Administrator"
+                ? eRoutes.adminFlights
+                : authenticatedUser.role === "Operator"
+                  ? eRoutes.operatorFlights
+                  : eRoutes.clientFlights
+              : eRoutes.clientFlights
+          }
           style={{ ...linkStyle, color: "#F9EFE4" }}
         >
           <p style={{ color: "#F9EFE4" }}>Dead Legs</p>
@@ -75,7 +83,11 @@ const ClientAppBar = ({ styles }: IProps) => {
         <Link
           href={
             signed_in && authenticatedUser
-              ? eRoutes.clientQuotationRequests
+              ? authenticatedUser.role === "Administrator"
+                ? eRoutes.adminQuotationRequests
+                : authenticatedUser.role === "Operator"
+                  ? eRoutes.operatorQuotationRequests
+                  : eRoutes.clientQuotationRequests
               : `${eRoutes.login}?returnUrl=${eRoutes.clientQuotationRequests}`
           }
           style={linkStyle}
@@ -85,7 +97,11 @@ const ClientAppBar = ({ styles }: IProps) => {
         <Link
           href={
             signed_in && authenticatedUser
-              ? eRoutes.clientBookings
+              ? authenticatedUser.role === "Administrator"
+                ? eRoutes.adminDashboard
+                : authenticatedUser.role === "Operator"
+                  ? eRoutes.operatorFlights
+                  : eRoutes.clientBookings
               : `${eRoutes.login}?returnUrl=${eRoutes.clientBookings}`
           }
           style={{ ...linkStyle, color: "#F9EFE4" }}

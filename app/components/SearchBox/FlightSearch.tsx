@@ -10,7 +10,7 @@ import {
   PlusOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
-import { Button, Divider, Dropdown, Form, Skeleton, Space } from "antd";
+import { Button, Divider, Form, Skeleton, Space } from "antd";
 import axios from "axios";
 import dayjs from "dayjs";
 
@@ -145,6 +145,8 @@ const FlightSearch = () => {
     ) {
       if (authenticatedUser && authenticatedUser.role == "Agency") {
         // Agency should not be redirected
+      } else if (authenticatedUser && authenticatedUser.role == "Operator") {
+        router.push(`/operator/flights`);
       } else {
         router.push(`/flights`);
       }
@@ -634,7 +636,7 @@ const FlightSearch = () => {
                   >
                     Add a destination
                   </Button>
-                  <Dropdown overlay={menu} trigger={["click"]}>
+                  {/* <Dropdown overlay={menu} trigger={["click"]}>
                     <Button
                       icon={<PlusOutlined />}
                       type="primary"
@@ -643,7 +645,7 @@ const FlightSearch = () => {
                     >
                       Add extras
                     </Button>
-                  </Dropdown>
+                  </Dropdown> */}
                 </FormControl>
               )}
             </>
