@@ -30,12 +30,12 @@ const ClientAppBar = ({ styles }: IProps) => {
   const dispatch = useAppDispatch();
 
   const linkStyle: React.CSSProperties = {
-    color: "#ffffff",
+    color: "#F9EFE4",
     fontSize: pathname == "/" ? "1.1rem" : "1rem",
   };
 
   const iconStyle: React.CSSProperties = {
-    color: "#ffffff",
+    color: "#F9EFE4",
     fontSize: pathname == "/" ? "1.8rem" : "1.4rem",
     cursor: "pointer",
   };
@@ -45,7 +45,7 @@ const ClientAppBar = ({ styles }: IProps) => {
       justify="space-between"
       align="center"
       style={{ height: "80px", padding: "0 40px" }}
-      className={`client-app-bar w-full ${pathname !== eRoutes.homePage ? "bg-light-primary" : ""} text-light-background`}
+      className={`client-app-bar w-full ${pathname !== eRoutes.homePage ? "bg-light-primary" : ""} `}
     >
       <Link
         href={eRoutes.homePage}
@@ -66,28 +66,47 @@ const ClientAppBar = ({ styles }: IProps) => {
         </div>
       </Link>
       <Flex justify="end" align="center" gap={44}>
-        <Link href={eRoutes.clientFlights} style={linkStyle}>
-          Dead Legs
+        <Link
+          href={
+            signed_in && authenticatedUser
+              ? authenticatedUser.role === "Administrator"
+                ? eRoutes.adminFlights
+                : authenticatedUser.role === "Operator"
+                  ? eRoutes.operatorFlights
+                  : eRoutes.clientFlights
+              : eRoutes.clientFlights
+          }
+          style={{ ...linkStyle, color: "#F9EFE4" }}
+        >
+          <p style={{ color: "#F9EFE4" }}>Dead Legs</p>
         </Link>
         <Link
           href={
             signed_in && authenticatedUser
-              ? eRoutes.clientQuotationRequests
+              ? authenticatedUser.role === "Administrator"
+                ? eRoutes.adminQuotationRequests
+                : authenticatedUser.role === "Operator"
+                  ? eRoutes.operatorQuotationRequests
+                  : eRoutes.clientQuotationRequests
               : `${eRoutes.login}?returnUrl=${eRoutes.clientQuotationRequests}`
           }
           style={linkStyle}
         >
-          Quotation Requests
+          <p style={{ color: "#F9EFE4" }}>Quotation Requests</p>
         </Link>
         <Link
           href={
             signed_in && authenticatedUser
-              ? eRoutes.clientBookings
+              ? authenticatedUser.role === "Administrator"
+                ? eRoutes.adminDashboard
+                : authenticatedUser.role === "Operator"
+                  ? eRoutes.operatorFlights
+                  : eRoutes.clientBookings
               : `${eRoutes.login}?returnUrl=${eRoutes.clientBookings}`
           }
-          style={linkStyle}
+          style={{ ...linkStyle, color: "#F9EFE4" }}
         >
-          Manage Bookings
+          <p style={{ color: "#F9EFE4" }}>Manage Bookings</p>
         </Link>
         {signed_in && authenticatedUser ? (
           <Link
@@ -99,11 +118,11 @@ const ClientAppBar = ({ styles }: IProps) => {
                   : eRoutes.clientProfile
             }
           >
-            <UserOutlined style={iconStyle} />
+            <UserOutlined style={{ ...iconStyle, color: "#F9EFE4" }} />
           </Link>
         ) : (
           <Link href={eRoutes.login}>
-            <UserOutlined style={iconStyle} />
+            <UserOutlined style={{ ...iconStyle, color: "#F9EFE4" }} />
           </Link>
         )}
         {/* <MenuOutlined style={iconStyle} /> */}
