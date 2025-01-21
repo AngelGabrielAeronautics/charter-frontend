@@ -12,8 +12,16 @@ export default function Home() {
     >
       <ClientAppBar />
       <div className="mb-28 mr-28 mt-32 h-full min-h-full self-end">
-        <h1 className="text-white">LAUNCHING 2025!</h1>
-        <p className="font-montserrat text-xl font-light leading-relaxed text-white">
+        <h1 style={{ color: "#F9EFE4" }} className="">
+          LAUNCHING 2025!
+        </h1>
+        <p
+          style={{
+            color: "#F9EFE4",
+            fontWeight: "400",
+          }}
+          className="font-montserrat text-xl font-light leading-relaxed"
+        >
           Compare quotes from <br />
           multiple charter operators <br />
           with one simple request.
