@@ -21,7 +21,35 @@ export const AntFormItem = styled(Form.Item)`
   border-radius: 10px;
   padding: 12px 16px;
   box-sizing: border-box;
-  margin: 0;
+  margin: 2px !important;
+  width: 15%;
+`;
+
+export const RightAntFormItem = styled(Form.Item)`
+  background-color: #ffffffb5;
+  border-radius: 0 10px 10px 0;
+  padding: 12px 8px;
+  box-sizing: border-box;
+  margin: 2px !important;
+  margin-right: 2rem !important;
+  width: 15%;
+`;
+
+export const LeftAntFormItem = styled(Form.Item)`
+  background-color: #ffffffb5;
+  border-radius: 10px 0 0 10px;
+  padding: 12px 8px;
+  box-sizing: border-box;
+  margin: 2px !important;
+  width: 15%;
+`;
+
+export const InnerAntFormItem = styled(Form.Item)`
+  background-color: #ffffffb5;
+  border-radius: 0px;
+  padding: 12px 8px;
+  box-sizing: border-box;
+  margin: 2px !important;
   width: 15%;
 `;
 
@@ -124,6 +152,7 @@ export const AntButton = styled(Button)`
   padding: "1rem";
   background-color: "#0b374675";
   width: "100%";
+  margin-right: 1rem !important;
   color: "#F9EFE4";
   font-size: "1rem";
   font-weight: "500";

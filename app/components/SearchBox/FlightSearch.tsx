@@ -33,7 +33,10 @@ import {
   AntSelect,
   AntTimePicker,
   FormControl,
+  InnerAntFormItem,
   InputLabel,
+  LeftAntFormItem,
+  RightAntFormItem,
 } from "./components.styled";
 
 const tripActionStyle = {
@@ -352,11 +355,11 @@ const FlightSearch = () => {
       }}
     >
       <FormControl>
-        <AntFormItem
+        <LeftAntFormItem
           rules={[
             { required: true, message: "Please input your departure city" },
           ]}
-          style={{ width: "25%" }}
+          style={{ width: "16%" }}
         >
           <InputLabel>Departure</InputLabel>
           <Form.Item name="departure" noStyle>
@@ -375,12 +378,12 @@ const FlightSearch = () => {
               notFoundContent={null}
             />
           </Form.Item>
-        </AntFormItem>
-        <AntFormItem
+        </LeftAntFormItem>
+        <InnerAntFormItem
           rules={[
             { required: true, message: "Please input your arrival city" },
           ]}
-          style={{ width: "25%" }}
+          style={{ width: "16%" }}
         >
           <InputLabel>Arrival</InputLabel>
           <Form.Item name="arrival" noStyle>
@@ -399,31 +402,31 @@ const FlightSearch = () => {
               notFoundContent={null}
             />
           </Form.Item>
-        </AntFormItem>
-        <AntFormItem
+        </InnerAntFormItem>
+        <InnerAntFormItem
           rules={[
             { required: true, message: "Please input your departure date" },
           ]}
-          style={{ width: "10%" }}
+          style={{ width: "16%" }}
         >
           <InputLabel>Date</InputLabel>
           <Form.Item name="date" noStyle>
             <AntDatePicker onChange={runChecks} />
           </Form.Item>
-        </AntFormItem>
-        <AntFormItem
+        </InnerAntFormItem>
+        <InnerAntFormItem
           initialValue={dayjs("12:00", "HH:mm")}
           rules={[
             { required: true, message: "Please input your departure time" },
           ]}
-          style={{ width: "7.5%" }}
+          style={{ width: "16%" }}
         >
           <InputLabel>Time</InputLabel>
           <Form.Item name="time" noStyle>
             <AntTimePicker showSecond={false} onChange={runChecks} />
           </Form.Item>
-        </AntFormItem>
-        <AntFormItem
+        </InnerAntFormItem>
+        <RightAntFormItem
           rules={[
             {
               required: true,
@@ -441,7 +444,7 @@ const FlightSearch = () => {
               onChange={runChecks}
             />
           </Form.Item>
-        </AntFormItem>
+        </RightAntFormItem>
         <AntButton
           type="primary"
           htmlType="submit"
