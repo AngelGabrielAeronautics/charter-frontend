@@ -410,7 +410,10 @@ const FlightSearch = () => {
         </InnerAntFormItem>
         <InnerAntFormItem
           rules={[
-            { required: true, message: "Please input your departure date" },
+            {
+              required: true,
+              message: "Please input your departure date",
+            },
           ]}
           style={{ width: "16%" }}
         >
@@ -554,10 +557,18 @@ const FlightSearch = () => {
                       <InputLabel>Date</InputLabel>
                       <Form.Item {...restField} name={[name, "date"]} noStyle>
                         <AntDatePicker
-                          disabledDate={(current) =>
-                            form.getFieldValue("date") &&
-                            current < dayjs(form.getFieldValue("date"))
-                          }
+                          disabledDate={(current) => {
+                            const legs = form.getFieldValue('legs') || [];
+                            const previousLeg = key > 0 ? legs[key - 1]?.date : form.getFieldValue('date');
+                            const nextLeg = legs[key + 1]?.date;
+                            
+                            // Disable dates before the previous leg or after the next leg
+                            return (
+                              (previousLeg && current < dayjs(previousLeg)) ||
+                              (nextLeg && current > dayjs(nextLeg)) ||
+                              current < dayjs().startOf('day')
+                            );
+                          }}
                           onChange={runChecks}
                           defaultValue={form.getFieldValue("date")}
                         />
