@@ -553,7 +553,14 @@ const FlightSearch = () => {
                     >
                       <InputLabel>Date</InputLabel>
                       <Form.Item {...restField} name={[name, "date"]} noStyle>
-                        <AntDatePicker onChange={runChecks} />
+                        <AntDatePicker
+                          disabledDate={(current) =>
+                            form.getFieldValue("date") &&
+                            current < dayjs(form.getFieldValue("date"))
+                          }
+                          onChange={runChecks}
+                          defaultValue={form.getFieldValue("date")}
+                        />
                       </Form.Item>
                     </InnerAntFormItem>
                     <RightAntFormItem
@@ -596,12 +603,11 @@ const FlightSearch = () => {
                     }}
                     onClick={() => {
                       const legs = form.getFieldValue("legs") || [];
-                      const lastLeg =
-                        legs?.length > 0 ? legs[legs.length - 1] : null;
+                      const lastLeg = legs?.length > 0 ? legs[legs.length - 1] : null;
                       const newLeg = {
-                        departure:
-                          lastLeg?.arrival ?? form.getFieldValue("arrival"),
+                        departure: lastLeg?.arrival ?? form.getFieldValue("arrival"),
                         arrival: form.getFieldValue("departure"),
+                        date: lastLeg?.date ?? form.getFieldValue("date"),
                         time: dayjs("12:00", "HH:mm"),
                       };
 
@@ -621,12 +627,11 @@ const FlightSearch = () => {
                       marginRight: "1rem",
                     }}
                     onClick={() => {
-                      const legs = form.getFieldValue("legs");
-                      const lastLeg =
-                        legs?.length > 0 ? legs[legs.length - 1] : null;
+                      const legs = form.getFieldValue("legs") || [];
+                      const lastLeg = legs?.length > 0 ? legs[legs.length - 1] : null;
                       const newLeg = {
-                        departure:
-                          lastLeg?.arrival ?? form.getFieldValue("arrival"),
+                        departure: lastLeg?.arrival ?? form.getFieldValue("arrival"),
+                        date: lastLeg?.date ?? form.getFieldValue("date"),
                         time: dayjs("12:00", "HH:mm"),
                       };
 
@@ -636,16 +641,6 @@ const FlightSearch = () => {
                   >
                     Add a destination
                   </Button>
-                  {/* <Dropdown overlay={menu} trigger={["click"]}>
-                    <Button
-                      icon={<PlusOutlined />}
-                      type="primary"
-                      block
-                      style={{ ...tripActionStyle, width: "18.5%" }}
-                    >
-                      Add extras
-                    </Button>
-                  </Dropdown> */}
                 </FormControl>
               )}
             </>
