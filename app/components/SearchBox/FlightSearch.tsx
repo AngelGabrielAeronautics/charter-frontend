@@ -558,15 +558,18 @@ const FlightSearch = () => {
                       <Form.Item {...restField} name={[name, "date"]} noStyle>
                         <AntDatePicker
                           disabledDate={(current) => {
-                            const legs = form.getFieldValue('legs') || [];
-                            const previousLeg = key > 0 ? legs[key - 1]?.date : form.getFieldValue('date');
+                            const legs = form.getFieldValue("legs") || [];
+                            const previousLeg =
+                              key > 0
+                                ? legs[key - 1]?.date
+                                : form.getFieldValue("date");
                             const nextLeg = legs[key + 1]?.date;
-                            
+
                             // Disable dates before the previous leg or after the next leg
                             return (
                               (previousLeg && current < dayjs(previousLeg)) ||
                               (nextLeg && current > dayjs(nextLeg)) ||
-                              current < dayjs().startOf('day')
+                              current < dayjs().startOf("day")
                             );
                           }}
                           onChange={runChecks}
@@ -614,9 +617,11 @@ const FlightSearch = () => {
                     }}
                     onClick={() => {
                       const legs = form.getFieldValue("legs") || [];
-                      const lastLeg = legs?.length > 0 ? legs[legs.length - 1] : null;
+                      const lastLeg =
+                        legs?.length > 0 ? legs[legs.length - 1] : null;
                       const newLeg = {
-                        departure: lastLeg?.arrival ?? form.getFieldValue("arrival"),
+                        departure:
+                          lastLeg?.arrival ?? form.getFieldValue("arrival"),
                         arrival: form.getFieldValue("departure"),
                         date: lastLeg?.date ?? form.getFieldValue("date"),
                         time: dayjs("12:00", "HH:mm"),
@@ -639,9 +644,11 @@ const FlightSearch = () => {
                     }}
                     onClick={() => {
                       const legs = form.getFieldValue("legs") || [];
-                      const lastLeg = legs?.length > 0 ? legs[legs.length - 1] : null;
+                      const lastLeg =
+                        legs?.length > 0 ? legs[legs.length - 1] : null;
                       const newLeg = {
-                        departure: lastLeg?.arrival ?? form.getFieldValue("arrival"),
+                        departure:
+                          lastLeg?.arrival ?? form.getFieldValue("arrival"),
                         date: lastLeg?.date ?? form.getFieldValue("date"),
                         time: dayjs("12:00", "HH:mm"),
                       };
