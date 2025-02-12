@@ -188,7 +188,31 @@ const FlightSearch = () => {
   }, [searchFlightCriteria]);
 
   const onFinish = (values: any) => {
-    const firstLeg: ISearchItem = {
+    // Add validation before processing
+    const firstLeg = values.departure === values.arrival;
+    const additionalLegsHaveSameAirports = values.legs?.some(
+      (leg: any) => leg.departure === leg.arrival
+    );
+
+    if (firstLeg || additionalLegsHaveSameAirports) {
+      form.setFields([
+        {
+          name: firstLeg
+            ? ["arrival"]
+            : [
+                "legs",
+                values.legs.findIndex(
+                  (leg: any) => leg.departure === leg.arrival
+                ),
+                "arrival",
+              ],
+          errors: ["Departure and arrival airports cannot be the same"],
+        },
+      ]);
+      return;
+    }
+
+    const firstLegItem: ISearchItem = {
       departureAirport:
         airportResults.find(
           (airport: IAirport) =>
@@ -242,7 +266,7 @@ const FlightSearch = () => {
         numberOfPassengers: values.seats,
       })) || [];
 
-    const searchItems = [firstLeg, ...additionalLegs];
+    const searchItems = [firstLegItem, ...additionalLegs];
 
     dispatch(setSearchFlightCriteria(searchItems));
     dispatch(searchFlights(searchItems));
@@ -264,6 +288,53 @@ const FlightSearch = () => {
     const airport = airports.find(
       (airport: IAirport) => airport._id === selection
     );
+
+    // Clear any existing validation errors when selecting new airport
+    if (key !== undefined) {
+      form.setFields([
+        {
+          name: [`legs`, key, type],
+          errors: [],
+        },
+      ]);
+    } else {
+      form.setFields([
+        {
+          name: [type],
+          errors: [],
+        },
+      ]);
+    }
+
+    // Add validation when selecting airports
+    if (key !== undefined) {
+      // For additional legs
+      const otherType = type === "departure" ? "arrival" : "departure";
+      const otherValue = form.getFieldValue(`legs[${key}][${otherType}]`);
+      if (airport?.fullLabel === otherValue) {
+        form.setFields([
+          {
+            name: [`legs`, key, type],
+            errors: ["Departure and arrival airports cannot be the same"],
+          },
+        ]);
+        return;
+      }
+    } else {
+      // For first leg
+      const otherType = type === "departure" ? "arrival" : "departure";
+      const otherValue = form.getFieldValue(otherType);
+      if (airport?.fullLabel === otherValue) {
+        form.setFields([
+          {
+            name: [type],
+            errors: ["Departure and arrival airports cannot be the same"],
+          },
+        ]);
+        return;
+      }
+    }
+
     if (key) {
       form.setFieldValue(`legs[${key}][${type}AirportObject]`, airport);
       form.setFieldValue(`legs[${key}][${type}]`, airport?.fullLabel);
@@ -565,14 +636,22 @@ const FlightSearch = () => {
                                 : form.getFieldValue("date");
                             const nextLeg = legs[key + 1]?.date;
 
-                            // Disable dates before the previous leg or after the next leg
                             return (
                               (previousLeg && current < dayjs(previousLeg)) ||
                               (nextLeg && current > dayjs(nextLeg)) ||
                               current < dayjs().startOf("day")
                             );
                           }}
-                          onChange={runChecks}
+                          onChange={(date) => {
+                            // Clear validation errors when date changes
+                            form.setFields([
+                              {
+                                name: [`legs`, name, "date"],
+                                errors: [],
+                              },
+                            ]);
+                            runChecks();
+                          }}
                           defaultValue={form.getFieldValue("date")}
                         />
                       </Form.Item>
