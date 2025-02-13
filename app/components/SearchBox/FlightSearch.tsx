@@ -236,7 +236,9 @@ const FlightSearch = () => {
       ),
       departureDate: values.date.format("YYYY-MM-DD"),
       // Make sure the time is in the correct format
-      departureTime: values.time.format("HH:mm"),
+      departureTime: values.time
+        ? values.time.format("HH:mm")
+        : dayjs().format("HH:mm"),
       numberOfPassengers: values.seats,
     };
 
@@ -262,11 +264,14 @@ const FlightSearch = () => {
             airport._id === leg.arrival || airport.fullLabel === leg.arrival
         ),
         departureDate: leg.date.format("YYYY-MM-DD"),
-        departureTime: leg.time.format("HH:mm"),
+        departureTime: leg.time
+          ? leg.time.format("HH:mm")
+          : dayjs().format("HH:mm"),
         numberOfPassengers: values.seats,
       })) || [];
 
     const searchItems = [firstLegItem, ...additionalLegs];
+    console.log("searchItems =====>", searchItems);
 
     dispatch(setSearchFlightCriteria(searchItems));
     dispatch(searchFlights(searchItems));
@@ -285,6 +290,9 @@ const FlightSearch = () => {
   };
 
   const selectAirport = (selection: any, type: string, key?: number) => {
+    console.log("selection =====>", selection);
+    const values = form.getFieldsValue();
+    console.log("values =====>", values);
     const airport = airports.find(
       (airport: IAirport) => airport._id === selection
     );
@@ -294,10 +302,6 @@ const FlightSearch = () => {
       key !== undefined
         ? form.getFieldValue(`legs[${key}][${type}]`)
         : form.getFieldValue(type);
-
-    if (currentValue) {
-      form.setFieldValue("legs", []);
-    }
 
     // Clear validation errors
     if (key !== undefined) {
@@ -318,9 +322,9 @@ const FlightSearch = () => {
 
     // Add validation when selecting airports
     if (key !== undefined) {
-      // For additional legs
       const otherType = type === "departure" ? "arrival" : "departure";
-      const otherValue = form.getFieldValue(`legs[${key}][${otherType}]`);
+      const legs = form.getFieldValue("legs");
+      const otherValue = legs?.[key]?.[otherType];
       if (airport?.fullLabel === otherValue) {
         form.setFields([
           {
@@ -331,7 +335,6 @@ const FlightSearch = () => {
         return;
       }
     } else {
-      // For first leg
       const otherType = type === "departure" ? "arrival" : "departure";
       const otherValue = form.getFieldValue(otherType);
       if (airport?.fullLabel === otherValue) {
@@ -345,13 +348,15 @@ const FlightSearch = () => {
       }
     }
 
-    if (key) {
-      form.setFieldValue(`legs[${key}][${type}AirportObject]`, airport);
+    // Always set the fullLabel for form values
+    if (key !== undefined) {
       form.setFieldValue(`legs[${key}][${type}]`, airport?.fullLabel);
+      form.setFieldValue(`legs[${key}][${type}AirportObject]`, airport);
     } else {
+      form.setFieldValue(type, airport?.fullLabel);
       form.setFieldValue(`${type}AirportObject`, airport);
-      form.setFieldValue(`${type}`, airport?.fullLabel);
     }
+
     const uniqueAirports = airports.filter(
       (airport: IAirport) =>
         !airportResults.some((result: IAirport) => result._id === airport._id)
@@ -362,22 +367,22 @@ const FlightSearch = () => {
 
   const clearSelectedAirport = (type: string, key?: number) => {
     // Only clear legs if there's an existing value being cleared
-    const currentValue =
-      key !== undefined
-        ? form.getFieldValue(`legs[${key}][${type}]`)
-        : form.getFieldValue(type);
+    // const currentValue =
+    //   key !== undefined
+    //     ? form.getFieldValue(`legs[${key}][${type}]`)
+    //     : form.getFieldValue(type);
 
-    if (currentValue) {
-      form.setFieldValue("legs", []);
-    }
+    // // if (currentValue) {
+    // //   form.setFieldValue("legs", []);
+    // // }
 
-    if (key !== undefined) {
-      form.setFieldValue(`legs[${key}][${type}]`, null);
-      form.setFieldValue(`legs[${key}][${type}AirportObject]`, null);
-    } else {
-      form.setFieldValue(`${type}`, null);
-      form.setFieldValue(`${type}AirportObject`, null);
-    }
+    // if (key !== undefined) {
+    //   form.setFieldValue(`legs[${key}][${type}]`, null);
+    //   form.setFieldValue(`legs[${key}][${type}AirportObject]`, null);
+    // } else {
+    //   form.setFieldValue(`${type}`, null);
+    //   form.setFieldValue(`${type}AirportObject`, null);
+    // }
     runChecks();
   };
 
@@ -595,9 +600,9 @@ const FlightSearch = () => {
                         <AntSelect
                           showSearch
                           onSearch={(value: string) => searchAirports(value)}
-                          onSelect={(value: any) =>
-                            selectAirport(value, "departure", key)
-                          }
+                          onSelect={(value: any) => {
+                            selectAirport(value, "departure", key);
+                          }}
                           allowClear
                           onClear={() => clearSelectedAirport("departure")}
                           options={(airports || []).map(
@@ -630,9 +635,9 @@ const FlightSearch = () => {
                         <AntSelect
                           showSearch
                           onSearch={(value: string) => searchAirports(value)}
-                          onSelect={(value: any) =>
-                            selectAirport(value, "arrival", key)
-                          }
+                          onSelect={(value: any) => {
+                            selectAirport(value, "arrival", key);
+                          }}
                           allowClear
                           onClear={() => clearSelectedAirport("arrival")}
                           options={(airports || []).map(
@@ -749,12 +754,25 @@ const FlightSearch = () => {
                       const legs = form.getFieldValue("legs") || [];
                       const lastLeg =
                         legs?.length > 0 ? legs[legs.length - 1] : null;
+                      const arrivalAirport = airportResults.find(
+                        (airport: IAirport) =>
+                          airport._id === form.getFieldValue("departure") ||
+                          airport.fullLabel === form.getFieldValue("departure")
+                      );
+                      const departureAirport = lastLeg?.arrival
+                        ? (airportResults.find(
+                            (airport: IAirport) =>
+                              airport._id === lastLeg.arrival ||
+                              airport.fullLabel === lastLeg.arrival
+                          )?.fullLabel ?? lastLeg.arrival)
+                        : form.getFieldValue("arrival");
+
                       const newLeg = {
-                        departure:
-                          lastLeg?.arrival ?? form.getFieldValue("arrival"),
-                        arrival: form.getFieldValue("departure"),
+                        departure: departureAirport,
+                        arrival:
+                          arrivalAirport?.fullLabel ??
+                          form.getFieldValue("departure"),
                         date: lastLeg?.date ?? form.getFieldValue("date"),
-                        // time: dayjs("12:00", "HH:mm"),
                       };
 
                       add(newLeg);
@@ -776,11 +794,17 @@ const FlightSearch = () => {
                       const legs = form.getFieldValue("legs") || [];
                       const lastLeg =
                         legs?.length > 0 ? legs[legs.length - 1] : null;
+                      const departureAirport = lastLeg?.arrival
+                        ? (airportResults.find(
+                            (airport: IAirport) =>
+                              airport._id === lastLeg.arrival ||
+                              airport.fullLabel === lastLeg.arrival
+                          )?.fullLabel ?? lastLeg.arrival)
+                        : form.getFieldValue("arrival");
+
                       const newLeg = {
-                        departure:
-                          lastLeg?.arrival ?? form.getFieldValue("arrival"),
+                        departure: departureAirport,
                         date: lastLeg?.date ?? form.getFieldValue("date"),
-                        // time: dayjs("12:00", "HH:mm"),
                       };
 
                       add(newLeg);
