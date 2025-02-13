@@ -363,7 +363,7 @@ const FlightSearch = () => {
     const time = form.getFieldValue("time");
     const seats = form.getFieldValue("seats");
 
-    if (departure && arrival && date && time && seats) {
+    if (departure && arrival && date && seats) {
       return true;
     }
 
@@ -376,10 +376,7 @@ const FlightSearch = () => {
     if (
       legs &&
       legs.length > 0 &&
-      legs.some(
-        (leg: any) =>
-          !leg?.departure || !leg?.arrival || !leg?.date || !leg?.time
-      )
+      legs.some((leg: any) => !leg?.departure || !leg?.arrival || !leg?.date)
     ) {
       return false;
     }
@@ -693,7 +690,7 @@ const FlightSearch = () => {
                       style={{ width: "7.5%" }}
                     >
                       <InputLabel>Seats</InputLabel>
-                      <Form.Item name="seats" noStyle>
+                      <Form.Item name={[name, "seats"]} noStyle>
                         <AntInput
                           type="number"
                           min={1}
@@ -732,7 +729,7 @@ const FlightSearch = () => {
                           lastLeg?.arrival ?? form.getFieldValue("arrival"),
                         arrival: form.getFieldValue("departure"),
                         date: lastLeg?.date ?? form.getFieldValue("date"),
-                        time: dayjs("12:00", "HH:mm"),
+                        // time: dayjs("12:00", "HH:mm"),
                       };
 
                       add(newLeg);
@@ -758,7 +755,7 @@ const FlightSearch = () => {
                         departure:
                           lastLeg?.arrival ?? form.getFieldValue("arrival"),
                         date: lastLeg?.date ?? form.getFieldValue("date"),
-                        time: dayjs("12:00", "HH:mm"),
+                        // time: dayjs("12:00", "HH:mm"),
                       };
 
                       add(newLeg);
