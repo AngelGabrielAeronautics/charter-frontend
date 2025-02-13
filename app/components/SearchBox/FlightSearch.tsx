@@ -553,7 +553,7 @@ const FlightSearch = () => {
                           message: "Please input your departure city",
                         },
                       ]}
-                      style={{ width: "25%" }}
+                      style={{ width: "16%" }}
                     >
                       <InputLabel>Departure</InputLabel>
                       <Form.Item
@@ -588,7 +588,7 @@ const FlightSearch = () => {
                           message: "Please input your arrival city",
                         },
                       ]}
-                      style={{ width: "25%" }}
+                      style={{ width: "16%" }}
                     >
                       <InputLabel>Arrival</InputLabel>
                       <Form.Item
@@ -623,7 +623,7 @@ const FlightSearch = () => {
                           message: "Please input your departure date",
                         },
                       ]}
-                      style={{ width: "10%" }}
+                      style={{ width: "16%" }}
                     >
                       <InputLabel>Date</InputLabel>
                       <Form.Item {...restField} name={[name, "date"]} noStyle>
@@ -656,7 +656,7 @@ const FlightSearch = () => {
                         />
                       </Form.Item>
                     </InnerAntFormItem>
-                    <RightAntFormItem
+                    <InnerAntFormItem
                       initialValue={dayjs("12:00", "HH:mm")}
                       rules={[
                         {
@@ -664,12 +664,32 @@ const FlightSearch = () => {
                           message: "Please input your departure time",
                         },
                       ]}
-                      style={{ width: "7.5%" }}
+                      style={{ width: "16%" }}
                     >
                       <InputLabel>Time</InputLabel>
                       <Form.Item {...restField} name={[name, "time"]} noStyle>
                         <AntTimePicker
                           showSecond={false}
+                          onChange={runChecks}
+                        />
+                      </Form.Item>
+                    </InnerAntFormItem>
+                    <RightAntFormItem
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input your number of passengers",
+                        },
+                      ]}
+                      style={{ width: "7.5%" }}
+                    >
+                      <InputLabel>Seats</InputLabel>
+                      <Form.Item name="seats" noStyle>
+                        <AntInput
+                          type="number"
+                          min={1}
+                          defaultValue={0}
+                          suffix={<TeamOutlined />}
                           onChange={runChecks}
                         />
                       </Form.Item>
