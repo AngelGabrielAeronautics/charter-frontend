@@ -12,6 +12,7 @@ export default function Home() {
         className="absolute inset-0 h-full w-full object-cover"
       >
         <source src="/bg-video.mp4" type="video/mp4" />
+        
       </video>
       <div className="relative z-10 w-full">
         <ClientAppBar />

@@ -666,20 +666,27 @@ const FlightSearch = () => {
                         <AntDatePicker
                           disabledDate={(current) => {
                             const legs = form.getFieldValue("legs") || [];
-                            const previousLeg =
-                              key > 0
-                                ? legs[key - 1]?.date
-                                : form.getFieldValue("date");
-                            const nextLeg = legs[key + 1]?.date;
+                            // Get the first leg date (from the main form)
+                            const firstLegDate = form.getFieldValue("date");
+                            
+                            // Find the current leg's index
+                            const currentLegIndex = legs.findIndex((_: any, idx: any) => idx === name);
+                            
+                            // Get previous leg's date (either from legs array or first leg)
+                            const previousLegDate = currentLegIndex > 0 
+                              ? legs[currentLegIndex - 1]?.date 
+                              : firstLegDate;
+                            
+                            // Get next leg's date
+                            const nextLegDate = legs[currentLegIndex + 1]?.date;
 
                             return (
-                              (previousLeg && current < dayjs(previousLeg)) ||
-                              (nextLeg && current > dayjs(nextLeg)) ||
+                              (previousLegDate && current < dayjs(previousLegDate)) ||
+                              (nextLegDate && current > dayjs(nextLegDate)) ||
                               current < dayjs().startOf("day")
                             );
                           }}
                           onChange={(date) => {
-                            // Clear validation errors when date changes
                             form.setFields([
                               {
                                 name: [`legs`, name, "date"],
