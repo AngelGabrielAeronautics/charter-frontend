@@ -289,7 +289,17 @@ const FlightSearch = () => {
       (airport: IAirport) => airport._id === selection
     );
 
-    // Clear any existing validation errors when selecting new airport
+    // Only clear legs if there's an existing value being changed
+    const currentValue =
+      key !== undefined
+        ? form.getFieldValue(`legs[${key}][${type}]`)
+        : form.getFieldValue(type);
+
+    if (currentValue) {
+      form.setFieldValue("legs", []);
+    }
+
+    // Clear validation errors
     if (key !== undefined) {
       form.setFields([
         {
@@ -350,9 +360,24 @@ const FlightSearch = () => {
     runChecks();
   };
 
-  const clearSelectedAirport = (type: string) => {
-    form.setFieldValue(`${type}`, null);
-    form.setFieldValue(`${type}AirportObject`, null);
+  const clearSelectedAirport = (type: string, key?: number) => {
+    // Only clear legs if there's an existing value being cleared
+    const currentValue =
+      key !== undefined
+        ? form.getFieldValue(`legs[${key}][${type}]`)
+        : form.getFieldValue(type);
+
+    if (currentValue) {
+      form.setFieldValue("legs", []);
+    }
+
+    if (key !== undefined) {
+      form.setFieldValue(`legs[${key}][${type}]`, null);
+      form.setFieldValue(`legs[${key}][${type}AirportObject]`, null);
+    } else {
+      form.setFieldValue(`${type}`, null);
+      form.setFieldValue(`${type}AirportObject`, null);
+    }
     runChecks();
   };
 
