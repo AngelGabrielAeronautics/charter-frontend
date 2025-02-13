@@ -426,9 +426,9 @@ const FlightSearch = () => {
       onFinish={onFinish}
       id="flight-search-form"
       style={{ opacity: isLoading ? 0 : 1, transition: "opacity 0.2s" }}
-      initialValues={{
-        time: dayjs("12:00", "HH:mm"),
-      }}
+      // initialValues={{
+      //   time: dayjs("12:00", "HH:mm"),
+      // }}
     >
       <FormControl>
         <LeftAntFormItem
@@ -468,7 +468,16 @@ const FlightSearch = () => {
               onSearch={(value: string) => searchAirports(value)}
               onSelect={(value: any) => selectAirport(value, "arrival")}
               allowClear
-              onClear={() => clearSelectedAirport("arrival")}
+              onClear={() => {
+                clearSelectedAirport("arrival");
+                form.setFieldValue("arrival", null);
+                form.setFields([
+                  {
+                    name: "arrival",
+                    errors: [],
+                  },
+                ]);
+              }}
               options={(airports || []).map((airport: IAirport) => ({
                 value: airport._id,
                 label: airport.fullLabel,
@@ -657,7 +666,7 @@ const FlightSearch = () => {
                       </Form.Item>
                     </InnerAntFormItem>
                     <InnerAntFormItem
-                      initialValue={dayjs("12:00", "HH:mm")}
+                      // initialValue={dayjs("12:00", "HH:mm")}
                       rules={[
                         {
                           required: true,
