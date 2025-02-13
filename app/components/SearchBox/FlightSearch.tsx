@@ -694,7 +694,7 @@ const FlightSearch = () => {
                         <AntInput
                           type="number"
                           min={1}
-                          defaultValue={0}
+                          defaultValue={1}
                           suffix={<TeamOutlined />}
                           onChange={runChecks}
                         />
