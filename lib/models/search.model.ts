@@ -6,6 +6,6 @@ export interface ISearchItem {
   arrivalAirport: string;
   arrivalAirportObject?: IAirport;
   departureDate: string;
-  departureTime: string | null;
+  departureTime?: string | null;
   numberOfPassengers: number;
 }

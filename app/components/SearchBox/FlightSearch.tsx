@@ -159,7 +159,7 @@ const FlightSearch = () => {
         departure: searchFlightCriteria[0].departureAirport,
         arrival: searchFlightCriteria[0].arrivalAirport,
         date: dayjs(searchFlightCriteria[0].departureDate),
-        time: dayjs(searchFlightCriteria[0].departureTime, "HH:mm"),
+        // time: dayjs(searchFlightCriteria[0].departureTime, "HH:mm"),
         seats: searchFlightCriteria[0].numberOfPassengers,
       });
       if (searchFlightCriteria.length > 1) {
@@ -235,12 +235,11 @@ const FlightSearch = () => {
           airport._id === values.arrival || airport.fullLabel === values.arrival
       ),
       departureDate: values.date.format("YYYY-MM-DD"),
-      // Make sure the time is in the correct format
-      departureTime: values.time
-        ? values.time.format("HH:mm")
-        : dayjs().format("HH:mm"),
+      departureTime: values.time ? values.time.format("HH:mm") : null,
       numberOfPassengers: values.seats,
     };
+
+    console.log("firstLegItem =====>", firstLegItem);
 
     const additionalLegs =
       values.legs?.map((leg: any) => ({
@@ -264,14 +263,13 @@ const FlightSearch = () => {
             airport._id === leg.arrival || airport.fullLabel === leg.arrival
         ),
         departureDate: leg.date.format("YYYY-MM-DD"),
-        departureTime: leg.time
-          ? leg.time.format("HH:mm")
-          : dayjs().format("HH:mm"),
+        departureTime: leg.time ? leg.time.format("HH:mm") : null,
         numberOfPassengers: values.seats,
       })) || [];
 
+    console.log("additionalLegs =====>", additionalLegs);
+
     const searchItems = [firstLegItem, ...additionalLegs];
-    console.log("searchItems =====>", searchItems);
 
     dispatch(setSearchFlightCriteria(searchItems));
     dispatch(searchFlights(searchItems));
@@ -503,9 +501,8 @@ const FlightSearch = () => {
           </Form.Item>
         </InnerAntFormItem>
         <InnerAntFormItem
-          initialValue={dayjs("12:00", "HH:mm")}
           rules={[
-            { required: true, message: "Please input your departure time" },
+            { required: false, message: "Please input your departure time" },
           ]}
           style={{ width: "16%" }}
         >
@@ -592,7 +589,7 @@ const FlightSearch = () => {
                     <InnerAntFormItem
                       rules={[
                         {
-                          required: true,
+                          required: false,
                           message: "Please input your arrival city",
                         },
                       ]}
@@ -715,7 +712,16 @@ const FlightSearch = () => {
                     </RightAntFormItem>
                     <MinusCircleOutlined
                       onClick={() => {
-                        remove(name);
+                        // Get all current legs
+                        const currentLegs = form.getFieldValue('legs');
+                        
+                        // Remove the current leg and all subsequent legs
+                        const updatedLegs = currentLegs.slice(0, name);
+                        
+                        // Update form with only the remaining valid legs
+                        form.setFieldValue('legs', updatedLegs);
+                        
+                        // Run validation checks
                         runChecks();
                       }}
                     />
