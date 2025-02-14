@@ -74,13 +74,20 @@ export const searchFlights = createAsyncThunk(
   async (criteria: ISearchItem[]) => {
     const promises = criteria.map(async (criterion) => {
       // Combine date and time into a single string
-      const departureDateTimeString = `${criterion.departureDate}T${criterion.departureTime}`;
+      let departureDateTimeString;
+      if (criterion.departureTime){
+
+         departureDateTimeString = `${criterion.departureDate}T${criterion.departureTime}`;
+      } else {
+        departureDateTimeString = criterion.departureDate;
+      }
 
       // Convert to a Date object
       const departureDateTime = new Date(departureDateTimeString);
 
       // Convert to ISO string for the API
       const departureDateTimeISO = departureDateTime.toISOString();
+      
 
       const response = await fetch(`${API_BASE_URL}/flights/search`, {
         method: "POST",
@@ -147,7 +154,7 @@ export const cancelFlight = createAsyncThunk(
 export const updateFlightThunk = createAsyncThunk(
   "flights/update",
   async (payload: any) => {
-    console.log("updateFlightThunk", payload)
+ 
     const response = await fetch(`${API_BASE_URL}/flights/${payload.id}`, {
       method: "PATCH",
       headers: {
