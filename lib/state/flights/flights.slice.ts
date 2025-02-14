@@ -154,7 +154,7 @@ export const cancelFlight = createAsyncThunk(
 export const updateFlightThunk = createAsyncThunk(
   "flights/update",
   async (payload: any) => {
-    console.log("updateFlightThunk", payload)
+ 
     const response = await fetch(`${API_BASE_URL}/flights/${payload.id}`, {
       method: "PATCH",
       headers: {

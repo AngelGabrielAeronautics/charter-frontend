@@ -239,7 +239,7 @@ const FlightSearch = () => {
       numberOfPassengers: values.seats,
     };
 
-    console.log("firstLegItem =====>", firstLegItem);
+
 
     const additionalLegs =
       values.legs?.map((leg: any) => ({
@@ -267,7 +267,7 @@ const FlightSearch = () => {
         numberOfPassengers: values.seats,
       })) || [];
 
-    console.log("additionalLegs =====>", additionalLegs);
+
 
     const searchItems = [firstLegItem, ...additionalLegs];
 
