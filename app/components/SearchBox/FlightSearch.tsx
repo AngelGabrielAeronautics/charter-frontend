@@ -10,7 +10,7 @@ import {
   PlusOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
-import { Button, Divider, Form, Skeleton, Space } from "antd";
+import { Button, Divider, Form, Skeleton, Space, notification } from "antd";
 import axios from "axios";
 import dayjs from "dayjs";
 
@@ -290,65 +290,40 @@ const FlightSearch = () => {
   };
 
   const selectAirport = (selection: any, type: string, key?: number) => {
-    console.log("selection =====>", selection);
+    const airport = airports.find((airport: IAirport) => airport._id === selection);
+    
+    // Get current form values
     const values = form.getFieldsValue();
-    console.log("values =====>", values);
-    const airport = airports.find(
-      (airport: IAirport) => airport._id === selection
-    );
-
-    // Only clear legs if there's an existing value being changed
-    const currentValue =
-      key !== undefined
-        ? form.getFieldValue(`legs[${key}][${type}]`)
-        : form.getFieldValue(type);
-
-    // Clear validation errors
+    
+    // Check if this is for a leg or main search
     if (key !== undefined) {
-      form.setFields([
-        {
-          name: [`legs`, key, type],
-          errors: [],
-        },
-      ]);
-    } else {
-      form.setFields([
-        {
-          name: [type],
-          errors: [],
-        },
-      ]);
-    }
-
-    // Add validation when selecting airports
-    if (key !== undefined) {
-      const otherType = type === "departure" ? "arrival" : "departure";
-      const legs = form.getFieldValue("legs");
-      const otherValue = legs?.[key]?.[otherType];
+      const legs = values.legs || [];
+      const currentLeg = legs[key] || {};
+      
+      // For legs, filter out the current departure/arrival
+      const otherValue = type === 'departure' ? currentLeg.arrival : currentLeg.departure;
+      
       if (airport?.fullLabel === otherValue) {
-        form.setFields([
-          {
-            name: [`legs`, key, type],
-            errors: ["Departure and arrival airports cannot be the same"],
-          },
-        ]);
+        notification.error({
+          message: 'Invalid Selection',
+          description: 'Departure and arrival airports cannot be the same'
+        });
         return;
       }
     } else {
-      const otherType = type === "departure" ? "arrival" : "departure";
-      const otherValue = form.getFieldValue(otherType);
+      // For main search, filter out the current departure/arrival
+      const otherValue = type === 'departure' ? values.arrival : values.departure;
+      
       if (airport?.fullLabel === otherValue) {
-        form.setFields([
-          {
-            name: [type],
-            errors: ["Departure and arrival airports cannot be the same"],
-          },
-        ]);
+        notification.error({
+          message: 'Invalid Selection',
+          description: 'Departure and arrival airports cannot be the same'
+        });
         return;
       }
     }
 
-    // Always set the fullLabel for form values
+    // If validation passes, update the form
     if (key !== undefined) {
       form.setFieldValue(`legs[${key}][${type}]`, airport?.fullLabel);
       form.setFieldValue(`legs[${key}][${type}AirportObject]`, airport);
@@ -366,23 +341,6 @@ const FlightSearch = () => {
   };
 
   const clearSelectedAirport = (type: string, key?: number) => {
-    // Only clear legs if there's an existing value being cleared
-    // const currentValue =
-    //   key !== undefined
-    //     ? form.getFieldValue(`legs[${key}][${type}]`)
-    //     : form.getFieldValue(type);
-
-    // // if (currentValue) {
-    // //   form.setFieldValue("legs", []);
-    // // }
-
-    // if (key !== undefined) {
-    //   form.setFieldValue(`legs[${key}][${type}]`, null);
-    //   form.setFieldValue(`legs[${key}][${type}AirportObject]`, null);
-    // } else {
-    //   form.setFieldValue(`${type}`, null);
-    //   form.setFieldValue(`${type}AirportObject`, null);
-    // }
     runChecks();
   };
 
@@ -472,10 +430,15 @@ const FlightSearch = () => {
               onSelect={(value: any) => selectAirport(value, "departure")}
               allowClear
               onClear={() => clearSelectedAirport("departure")}
-              options={(airports || []).map((airport: IAirport) => ({
-                value: airport._id,
-                label: airport.fullLabel,
-              }))}
+              options={(airports || [])
+                .filter(airport => {
+                  const values = form.getFieldsValue();
+                  return airport.fullLabel !== values.arrival;
+                })
+                .map((airport: IAirport) => ({
+                  value: airport._id,
+                  label: airport.fullLabel,
+                }))}
               suffixIcon={null}
               filterOption={false}
               notFoundContent={null}
@@ -505,10 +468,15 @@ const FlightSearch = () => {
                   },
                 ]);
               }}
-              options={(airports || []).map((airport: IAirport) => ({
-                value: airport._id,
-                label: airport.fullLabel,
-              }))}
+              options={(airports || [])
+                .filter(airport => {
+                  const values = form.getFieldsValue();
+                  return airport.fullLabel !== values.departure;
+                })
+                .map((airport: IAirport) => ({
+                  value: airport._id,
+                  label: airport.fullLabel,
+                }))}
               suffixIcon={null}
               filterOption={false}
               notFoundContent={null}
@@ -605,12 +573,16 @@ const FlightSearch = () => {
                           }}
                           allowClear
                           onClear={() => clearSelectedAirport("departure")}
-                          options={(airports || []).map(
-                            (airport: IAirport) => ({
+                          options={(airports || [])
+                            .filter(airport => {
+                              const legs = form.getFieldValue('legs') || [];
+                              const currentLeg = legs[name] || {};
+                              return airport.fullLabel !== currentLeg.arrival;
+                            })
+                            .map((airport: IAirport) => ({
                               value: airport._id,
                               label: airport.fullLabel,
-                            })
-                          )}
+                            }))}
                           suffixIcon={null}
                           filterOption={false}
                           notFoundContent={null}
@@ -640,12 +612,16 @@ const FlightSearch = () => {
                           }}
                           allowClear
                           onClear={() => clearSelectedAirport("arrival")}
-                          options={(airports || []).map(
-                            (airport: IAirport) => ({
+                          options={(airports || [])
+                            .filter(airport => {
+                              const legs = form.getFieldValue('legs') || [];
+                              const currentLeg = legs[name] || {};
+                              return airport.fullLabel !== currentLeg.departure;
+                            })
+                            .map((airport: IAirport) => ({
                               value: airport._id,
                               label: airport.fullLabel,
-                            })
-                          )}
+                            }))}
                           suffixIcon={null}
                           filterOption={false}
                           notFoundContent={null}
