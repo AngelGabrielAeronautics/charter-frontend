@@ -32,7 +32,7 @@ export interface ITripLeg {
   departureAirport: IAirport;
   arrivalAirport: IAirport;
   dateOfDeparture: Date;
-  timeOfDeparture: string;
+  timeOfDeparture: string | null | undefined;
 }
 
 export interface IPassengerCount {
