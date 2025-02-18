@@ -10,7 +10,7 @@ export interface IQuotationRequest {
   trip: ITripLeg[]
   petsAllowed: boolean;
   smokingAllowed: boolean;
-  status?: "Fulfilled" | "Pending" | "Quoted" | "Cancelled"; //To be confirmed by @Given
+  status?: "Fulfilled" | "Pending" | "Quoted" | "Cancelled";
   auditFields?: IAuditFields;
 }
 
@@ -32,7 +32,7 @@ export interface ITripLeg {
   departureAirport: IAirport;
   arrivalAirport: IAirport;
   dateOfDeparture: Date;
-  timeOfDeparture: string;
+  timeOfDeparture: string | null | undefined;
 }
 
 export interface IPassengerCount {
