@@ -491,7 +491,12 @@ const FlightSearch = () => {
           style={{ width: "16%" }}
         >
           <InputLabel>Date</InputLabel>
-          <Form.Item name="date" initialValue={dayjs()} noStyle>
+          <Form.Item name="date" initialValue={dayjs()} noStyle rules={[
+            {
+              required: true,
+              message: "Please input your departure date",
+            },
+          ]}>
             <AntDatePicker
               onChange={runChecks}
               disabledDate={(current) =>
@@ -635,7 +640,12 @@ const FlightSearch = () => {
                       style={{ width: "16%" }}
                     >
                       <InputLabel>Date</InputLabel>
-                      <Form.Item {...restField} name={[name, "date"]} noStyle>
+                      <Form.Item {...restField} name={[name, "date"]} noStyle rules={[
+                        {
+                          required: true,
+                          message: "Please input your departure date",
+                        },
+                      ]}>
                         <AntDatePicker
                           disabledDate={(current) => {
                             const legs = form.getFieldValue("legs") || [];
