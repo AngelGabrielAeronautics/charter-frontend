@@ -495,7 +495,7 @@ const FlightSearch = () => {
             <AntDatePicker
               onChange={runChecks}
               disabledDate={(current) =>
-                current && current < dayjs().startOf("day")
+                current && current < dayjs().startOf("day") || current > dayjs().add(12, "months").endOf("day")
               }
             />
           </Form.Item>
@@ -656,7 +656,7 @@ const FlightSearch = () => {
                             return (
                               (previousLegDate && current < dayjs(previousLegDate)) ||
                               (nextLegDate && current > dayjs(nextLegDate)) ||
-                              current < dayjs().startOf("day")
+                              current < dayjs().startOf("day") || current > dayjs().add(12, "months")
                             );
                           }}
                           onChange={(date) => {
