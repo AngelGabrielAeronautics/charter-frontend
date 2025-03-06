@@ -766,12 +766,15 @@ const FlightSearch = () => {
                           )?.fullLabel ?? lastLeg.arrival)
                         : form.getFieldValue("arrival");
 
+                        const previousSeats = lastLeg?.seats ?? form.getFieldValue("seats");
+
                       const newLeg = {
                         departure: departureAirport,
                         arrival:
                           arrivalAirport?.fullLabel ??
                           form.getFieldValue("departure"),
                         date: lastLeg?.date ?? form.getFieldValue("date"),
+                        seats: previousSeats,
                       };
 
                       add(newLeg);
@@ -801,9 +804,13 @@ const FlightSearch = () => {
                           )?.fullLabel ?? lastLeg.arrival)
                         : form.getFieldValue("arrival");
 
+                         const previousSeats = lastLeg?.seats ?? form.getFieldValue("seats");
+
+
                       const newLeg = {
                         departure: departureAirport,
                         date: lastLeg?.date ?? form.getFieldValue("date"),
+                        seats: previousSeats,
                       };
 
                       add(newLeg);
