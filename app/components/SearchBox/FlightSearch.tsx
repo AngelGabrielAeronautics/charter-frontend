@@ -52,6 +52,7 @@ const FlightSearch = () => {
   const [form] = Form.useForm();
   const [airports, setAirports] = useState<IAirport[]>([]);
   const [airportResults, setAirportResults] = useState<IAirport[]>([]);
+  const [flybackActive, setFlybackActive] = useState(true);
   const [checksPassed, setChecksPassed] = useState({
     firstLeg: false,
     additionalLegs: false,
@@ -188,7 +189,38 @@ const FlightSearch = () => {
   }, [searchFlightCriteria]);
 
   const onFinish = (values: any) => {
+
+     // Check if required fields are present
+  if (!values.departure || !values.arrival || !values.date || !values.seats) {
+    notification.error({
+      message: 'Missing Required Fields',
+      description: 'Please ensure you have selected departure, arrival, date, and number of passengers.',
+  
+    });
+    return;
+  }
+
+    // Check additional legs if they exist
+  if (values.legs && values.legs.length > 0) {
+    const invalidLeg = values.legs.find((leg: any, index: number) => 
+      !leg.departure || !leg.arrival || !leg.date
+    );
+
+    if (invalidLeg) {
+      notification.error({
+        message: 'Missing Required Fields',
+        description: 'Please ensure all additional legs have departure, arrival, and date selected.',
+      });
+      return;
+    }
+  }
+
+
+  
     // Add validation before processing
+
+
+
     const firstLeg = values.departure === values.arrival;
     const additionalLegsHaveSameAirports = values.legs?.some(
       (leg: any) => leg.departure === leg.arrival
@@ -491,11 +523,16 @@ const FlightSearch = () => {
           style={{ width: "16%" }}
         >
           <InputLabel>Date</InputLabel>
-          <Form.Item name="date" initialValue={dayjs()} noStyle>
+          <Form.Item name="date" initialValue={dayjs()} noStyle rules={[
+            {
+              required: true,
+              message: "Please input your departure date",
+            },
+          ]}>
             <AntDatePicker
               onChange={runChecks}
               disabledDate={(current) =>
-                current && current < dayjs().startOf("day")
+                current && current < dayjs().startOf("day") || current > dayjs().add(12, "months").endOf("day")
               }
             />
           </Form.Item>
@@ -635,7 +672,12 @@ const FlightSearch = () => {
                       style={{ width: "16%" }}
                     >
                       <InputLabel>Date</InputLabel>
-                      <Form.Item {...restField} name={[name, "date"]} noStyle>
+                      <Form.Item {...restField} name={[name, "date"]} noStyle rules={[
+                        {
+                          required: true,
+                          message: "Please input your departure date",
+                        },
+                      ]}>
                         <AntDatePicker
                           disabledDate={(current) => {
                             const legs = form.getFieldValue("legs") || [];
@@ -656,7 +698,7 @@ const FlightSearch = () => {
                             return (
                               (previousLegDate && current < dayjs(previousLegDate)) ||
                               (nextLegDate && current > dayjs(nextLegDate)) ||
-                              current < dayjs().startOf("day")
+                              current < dayjs().startOf("day") || current > dayjs().add(12, "months")
                             );
                           }}
                           onChange={(date) => {
@@ -730,11 +772,12 @@ const FlightSearch = () => {
               })}
               {checksPassed.additionalLegs && (
                 <FormControl id="trip-modifiers">
-                  <Button
-                    icon={<ArrowLeftOutlined />}
-                    type="primary"
-                    block
-                    style={{
+                  {flybackActive && (
+                    <Button
+                      icon={<ArrowLeftOutlined />}
+                      type="primary"
+                      block
+                      style={{
                       ...tripActionStyle,
                       width: "25%",
                       marginRight: "1rem",
@@ -756,20 +799,25 @@ const FlightSearch = () => {
                           )?.fullLabel ?? lastLeg.arrival)
                         : form.getFieldValue("arrival");
 
+                        const previousSeats = lastLeg?.seats ?? form.getFieldValue("seats");
+
                       const newLeg = {
                         departure: departureAirport,
                         arrival:
                           arrivalAirport?.fullLabel ??
                           form.getFieldValue("departure"),
                         date: lastLeg?.date ?? form.getFieldValue("date"),
+                        seats: previousSeats,
                       };
 
                       add(newLeg);
                       runChecks();
+                      setFlybackActive(false);
                     }}
                   >
                     Fly back
                   </Button>
+                  )}
                   <Button
                     icon={<PlusOutlined />}
                     type="primary"
@@ -791,9 +839,13 @@ const FlightSearch = () => {
                           )?.fullLabel ?? lastLeg.arrival)
                         : form.getFieldValue("arrival");
 
+                         const previousSeats = lastLeg?.seats ?? form.getFieldValue("seats");
+
+
                       const newLeg = {
                         departure: departureAirport,
                         date: lastLeg?.date ?? form.getFieldValue("date"),
+                        seats: previousSeats,
                       };
 
                       add(newLeg);
