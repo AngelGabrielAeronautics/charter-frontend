@@ -52,6 +52,7 @@ const FlightSearch = () => {
   const [form] = Form.useForm();
   const [airports, setAirports] = useState<IAirport[]>([]);
   const [airportResults, setAirportResults] = useState<IAirport[]>([]);
+  const [flybackActive, setFlybackActive] = useState(true);
   const [checksPassed, setChecksPassed] = useState({
     firstLeg: false,
     additionalLegs: false,
@@ -188,7 +189,38 @@ const FlightSearch = () => {
   }, [searchFlightCriteria]);
 
   const onFinish = (values: any) => {
+
+     // Check if required fields are present
+  if (!values.departure || !values.arrival || !values.date || !values.seats) {
+    notification.error({
+      message: 'Missing Required Fields',
+      description: 'Please ensure you have selected departure, arrival, date, and number of passengers.',
+  
+    });
+    return;
+  }
+
+    // Check additional legs if they exist
+  if (values.legs && values.legs.length > 0) {
+    const invalidLeg = values.legs.find((leg: any, index: number) => 
+      !leg.departure || !leg.arrival || !leg.date
+    );
+
+    if (invalidLeg) {
+      notification.error({
+        message: 'Missing Required Fields',
+        description: 'Please ensure all additional legs have departure, arrival, and date selected.',
+      });
+      return;
+    }
+  }
+
+
+  
     // Add validation before processing
+
+
+
     const firstLeg = values.departure === values.arrival;
     const additionalLegsHaveSameAirports = values.legs?.some(
       (leg: any) => leg.departure === leg.arrival
@@ -740,11 +772,12 @@ const FlightSearch = () => {
               })}
               {checksPassed.additionalLegs && (
                 <FormControl id="trip-modifiers">
-                  <Button
-                    icon={<ArrowLeftOutlined />}
-                    type="primary"
-                    block
-                    style={{
+                  {flybackActive && (
+                    <Button
+                      icon={<ArrowLeftOutlined />}
+                      type="primary"
+                      block
+                      style={{
                       ...tripActionStyle,
                       width: "25%",
                       marginRight: "1rem",
@@ -779,10 +812,12 @@ const FlightSearch = () => {
 
                       add(newLeg);
                       runChecks();
+                      setFlybackActive(false);
                     }}
                   >
                     Fly back
                   </Button>
+                  )}
                   <Button
                     icon={<PlusOutlined />}
                     type="primary"
